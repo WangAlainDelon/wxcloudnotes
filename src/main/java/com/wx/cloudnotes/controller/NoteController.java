@@ -26,7 +26,7 @@ public class NoteController {
     @RequestMapping("/note/index/inotecenter")
     public String noteIndex() {
         /**这里验证用户是否登陆，如果没有登陆则跳转到登陆的页面*/
-
+        System.out.println("");
         return "/note/inotecenter";
     }
 
