@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>WX云笔记</title>
+    <link rel="icon" href="static/img/wxcloudnote.ico" />
+    <link type="text/css" rel="stylesheet" href="static/css/base.css" />
+    <link type="text/css" rel="stylesheet" href="static/css/animate.min.css" />
+    <script type="text/javascript" src="static/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+
+
+        var detectmob = function () {
+            return navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i);
+        }
+        if (navigator.userAgent.match(/iPad/i)) {
+            window.location.href = '/web';
+        }
+        if (detectmob()) {
+            window.location.href = 'WAP/intro' + location.search;
+        }
+
+    </script>
+
+</head>
+<body>
+
+<div id="header">
+    <div class="header-shadow">
+        <div id="header-warp">
+            <div id="header-right">
+                <div id="user-info">
+                    <div class="user-drop">
+                        <a id="dropdown-button" href="/login">登录/注册</a>
+                        <span id="dropdown">
+                            <i></i>
+                        </span>
+                    </div>
+                    <ul id="dropdown-list">
+                        <li id="logout">
+                            <a>注销</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <a id="logo" href="index.html" title="@@title"  style="color: black;font-size: 23px; margin-top: 20px;" >
+                <img src="static/img/wxcloudnote.ico" style="height: 32px;width: 32px;"  /> 云笔记
+            </a>
+            <ul id="header-nav">
+                <li id="index-tab">
+                    <a href="index.html">云笔记</a>
+                </li>
+                <li id="charge-tab">
+                    <a href="javascript:void(0)">产品简介</a>
+                </li>
+                <li id="groupintro-tab">
+                    <a href="javascript:void(0)">帮助中心</a>
+                </li>
+
+
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="banner">
+    <div class="banner-box">
+        <div class="banner-computer"></div>
+        <div class="banner-left">
+            <h1 style="color: #4A90E2;">wx云笔记,方便好用</h1>
+            <h1 style="color: #4A90E2;">海量空间，与你分享</h1>
+            <h1 style="color: #4A90E2;">高效检索，一键分享</h1>
+            <div class="btn-banner">
+            </div>
+        </div>
+    </div>
+</div>
+<section class="detail">
+    <div class="wrap-a">
+        <div class="detail-wrap">
+            <div class="detail-img-doc">
+                <!-- <img src="https://shared-https.ydstatic.com/market/ynote-website/ic-cone.svg" alt="cone" data-wow-delay="0.3s" class="ic-01-cone wow fadeInLeft animated">
+                 <img src="https://shared-https.ydstatic.com/market/ynote-website/ic-01-win@2x.png" alt="computer" class="ic-01-computer wow fadeIn animated">-->
+                <img src="static/img/banner-win.jpg" alt="computer" class="ic-01-computer wow fadeIn animated"  style="width: 660px; height:464px ;"/>
+                <div class="ic-01-hide">
+                    <img src="https://shared-https.ydstatic.com/market/ynote-website/ic-01-red.svg" data-wow-offset="200" class="ic-01-red wow bounceInDown animated">
+                    <img src="https://shared-https.ydstatic.com/market/ynote-website/ic-01-yellow.svg" data-wow-delay="0.1s" class="ic-01-yellow wow bounceInDown animated">
+                    <img src="https://shared-https.ydstatic.com/market/ynote-website/ic-01-green.svg" data-wow-offset="200" data-wow-delay="0.2s" class="ic-01-green wow bounceInDown animated">
+                    <img src="https://shared-https.ydstatic.com/market/ynote-website/ic-01-blue-1.svg" data-wow-delay="0.3s" class="ic-01-blue wow bounceInDown animated">
+                </div>
+            </div>
+            <div class="detail-des detail-doc wow fadeInRight">
+                <h2>
+                    <span>高效检索，海量存储</span>
+                </h2>
+                <p>超大空间的容量用于存储你的笔记，海量笔记高效检索，安全性好，笔记不丢失</p>
+            </div>
+        </div>
+    </div>
+    <div class="wrap-b">
+        <img src="https://shared-https.ydstatic.com/market/ynote-website/ic_02_cube2.svg" alt="" class="ic-02-cubes wow fadeInDown animated">
+        <div class="detail-wrap">
+            <div class="detail-img-collect">
+                <img src="https://shared-https.ydstatic.com/market/ynote-website/ic_02_cube2.svg" alt="" data-wow-delay="0.2s" class="ic-02-cube wow fadeInLeftBig animated">
+                <div class="ic-02-phone-hide">
+                    <!--<img src="https://shared-https.ydstatic.com/market/ynote-website/ic-02-phone@2x.png" data-wow-delay="0.3s" class="ic-02-phone wow fadeInUp animated">-->
+                </div>
+                <!--<img src="https://shared-https.ydstatic.com/market/ynote-website/ic-02-logo.svg" alt="" data-wow-delay="0.6s" class="ic-02-logo wow zoomInUp animated">-->
+            </div>
+            <div class="detail-des detail-collect wow fadeInLeft">
+                <h2>
+                    <span>一键分享，收藏精品</span>
+                </h2>
+                <p>
+                    随时随地分享自己的比较，时时刻刻收藏经典之作
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="footer">
+
+
+    <ul id="ft-about-links">
+        <li><a href="/about.html" target="_blank">关于我们</a></li>
+        |
+        <li><a href="#" onclick="ysf.open();return false;" target="_blank">联系我们</a></li>
+        |
+        <li><a href="/license.html" target="_blank">招贤纳士</a></li>
+        |
+        <li><a href="http://corp.163.com/gb/legal.html" target="_blank">法律声明</a></li>
+        |
+        <li><a href="/month_license.html" target="_blank">友情链接</a></li>
+        |
+        <li><a href="http://noteyoudao.udesk.cn/hc" target="_blank">服务声明</a></li>
+        |
+        <li><a href="https://qiye.yixin.im/" target="_blank">广告声明</a></li>
+    </ul>
+    <div class="ft-line"></div>
+    <div id="copyright"><span id="copyright-year"></span> Copyright &copy; 2019 汪先生出品 版权所有</div>
+</div>
+<!--<script src="https://qiyukf.com/script/2dac580226b83fb71d8e31c5b40041cf.js" defer async></script>-->
+<!--<script src="https://cdn.bootcss.com/wow/1.1.2/wow.js"></script>-->
+
+<script>
+    var _hmt = _hmt || [];
+    (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?30b679eb2c90c60ff8679ce4ca562fcc";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+</body>
+</html>

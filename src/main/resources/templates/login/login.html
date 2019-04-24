@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Wopop</title>
+
+    <link href="static/css/style.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="static/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="static/js/cas.login.js"></script>
+    <script src="static/js/jquery.alerts.js"></script>
+    <script type="text/javascript" >
+        $(function () {
+            $("#button").click(function () {
+                $.post("/userLogin", $("#formlogin").serialize(),function(data){
+                    if (data.status == 200) {
+                        alert("登录成功！");
+                        location.href = "/note/index/inotecenter"; //登陆成功访问网站首页
+                    } else {
+                        alert("登录失败，原因是：" + data.msg,"失败");
+                    }
+                });
+               /* $.ajax({
+                    //几个参数需要注意一下
+                    type: "POST",//方法类型
+                    dataType: "json",//预期服务器返回的数据类型
+                    url: "/userLogin" ,//url
+                    data: $('#form1').serialize(),
+                    success: function (result) {
+                        console.log(result);//打印服务端返回的数据(调试用)
+                        if (result.resultCode == 200) {
+                            alert("SUCCESS");
+                        }
+                        ;
+                    },
+                    error : function() {
+                        alert("异常！");
+                    }
+                });*/
+            });
+        })
+
+    </script>
+
+
+</head>
+
+<body class="login">
+
+<div class="login_m">
+    <div class="login_logo"><img src="static/img/banner-win.png" width="196" height="46"></div>
+    <div class="login_boder">
+        <form id="formlogin"  method="post">
+        <div class="login_padding">
+            <h2>用户名</h2>
+            <label>
+                <input type="text" id="user_name" class="txt_input txt_input2" name="user_name"
+                       onfocus="if (value ==&#39;Your name&#39;){value =&#39;&#39;}"
+                       onblur="if (value ==&#39;&#39;){value=&#39;Your name&#39;}" value="Your name">
+            </label>
+            <h2>密码</h2>
+            <label>
+                <input type="password" name="user_password" id="user_password" class="txt_input"
+                       onfocus="if (value ==&#39;******&#39;){value =&#39;&#39;}"
+                       onblur="if (value ==&#39;&#39;){value=&#39;******&#39;}" value="******">
+            </label>
+            <p class="forgot"><a href="javascript:void(0);">忘记密码?</a></p>
+            <div class="rem_sub">
+                <div class="rem_sub_l">
+                    <input type="checkbox" name="checkbox" id="save_me">
+                    <label for="checkbox">记住</label>
+                    <label style="margin-left: 80px"><a href="#">注册账号</a></label>
+                </div>
+                <label>
+                       <input type="button" class="sub_button" name="button" id="button" value="登录" style="opacity: 0.7;">
+                </label>
+            </div>
+        </div>
+        </form>
+    </div><!--login_boder end-->
+</div><!--login_m end-->
+
+<br/>
+<br/>
+
+<p align="center"> More Templates <a href="http://h2design.taobao.com/" target="_blank" title="氢设计">氢设计</a></p>
+
+</body>
+</html>

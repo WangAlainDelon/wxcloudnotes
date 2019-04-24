@@ -1,0 +1,41 @@
+server:
+    port: 8080
+    error:
+      path: /error
+spring:
+  thymeleaf:
+    suffix: .html
+    cache: false
+    encoding: UTF-8
+    prefix:  classpath:/templates/
+  redis:
+    timeout: 2000ms
+    host: 192.168.25.134
+    port: 6379
+  profiles:
+        active: prod
+  datasource:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/cloud_notes?useSSL=true&useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: 133309
+  jpa:
+      hibernate:
+        ddl-auto: create
+      show-sql: true
+  mvc:
+    static-path-pattern: /static/**
+
+mybatis:
+  mapper-locations: classpath:mapper/UserMapper.xml
+  type-aliases-package: com.wx.cloudnotes.domain.User
+
+logging:
+  config: classpath:log4j2.yml
+
+
+hbase:
+  zookeeper:
+    quorum: zookeeper1
+    property:
+      clientPort: 2181
