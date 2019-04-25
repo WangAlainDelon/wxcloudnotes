@@ -86,10 +86,7 @@ public class RedisTools {
      * ==================String类================
      */
 
-    public Long appendRightList(String key, String str) {
-        Long aLong = redisTemplate.opsForList().rightPush(key, str);
-        return aLong;
-    }
+
 
     /**
      * 普通的缓存放入
@@ -217,6 +214,16 @@ public class RedisTools {
     /**
      * ==================List类型================
      */
+    /**
+     * 根据key来存放值
+     * @param key
+     * @param str
+     * @return
+     */
+    public Long appendRightList(String key, String str) {
+        Long aLong = redisTemplate.opsForList().rightPush(key, str);
+        return aLong;
+    }
     /***
      * 根据key查询list
      * @param key

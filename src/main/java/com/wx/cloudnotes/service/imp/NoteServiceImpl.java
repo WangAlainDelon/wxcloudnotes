@@ -205,17 +205,84 @@ public class NoteServiceImpl implements NoteService {
         return redisDao.delNotebookToRedis(userName, oldNoteBookToString.toString());
     }
 
+    /**
+     * 重命名笔记本
+     * @param noteBookName
+     * @param oldNoteBookName
+     * @param userName
+     * @param createTime
+     * @param status
+     * @return
+     */
+    @Override
+    public boolean updateNoteBook(String noteBookName, String oldNoteBookName, String userName, String createTime, int status) {
+        boolean ifSucess = false;
+        ifSucess = renameNoteBookToRedis(noteBookName, oldNoteBookName, userName, createTime, status);
+        if (ifSucess) {
+            try {
+                ifSucess = renameNoteBookToHbase(noteBookName, oldNoteBookName, userName, createTime, status);
+                if (!ifSucess) {
+                    renameNoteBookToRedis(oldNoteBookName, noteBookName, userName, createTime, status);
+                }
+            } catch (Exception e) {
+                renameNoteBookToRedis(oldNoteBookName, noteBookName, userName, createTime, status);
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return ifSucess;
+    }
+
+    /**
+     * 重命名redis中的笔记本名字
+     * @param noteBookName
+     * @param oldNoteBookName
+     * @param userName
+     * @param createTime
+     * @param status
+     * @return
+     */
+    public boolean renameNoteBookToRedis(String noteBookName, String oldNoteBookName, String userName, String createTime, int status) {
+        StringBuffer noteBookToString = new StringBuffer();
+        // 需要新增的信息
+        noteBookToString
+                .append(userName + Constants.ROWKEY_SEPARATOR
+                        + createTime.trim()).append(Constants.STRING_SEPARATOR)
+                .append(noteBookName).append(Constants.STRING_SEPARATOR)
+                .append(createTime).append(Constants.STRING_SEPARATOR)
+                .append(status);
+        // 需要删除的信息
+        StringBuffer oldNoteBookToString = new StringBuffer();
+        oldNoteBookToString
+                .append(userName + Constants.ROWKEY_SEPARATOR
+                        + createTime.trim()).append(Constants.STRING_SEPARATOR)
+                .append(oldNoteBookName).append(Constants.STRING_SEPARATOR)
+                .append(createTime).append(Constants.STRING_SEPARATOR)
+                .append(status);
+        // 先删后加
+        return redisDao.updateNotebookToRedis(userName, oldNoteBookToString.toString(), noteBookToString.toString());
+    }
+
+    /**
+     * 重命名hbase中的笔记本名字
+     * @param newNoteBookName
+     * @param oldNoteBookName
+     * @param userName
+     * @param createTime
+     * @param status
+     * @return
+     */
+    public boolean renameNoteBookToHbase(String newNoteBookName, String oldNoteBookName, String userName, String createTime, int status) {
+        // pingrowkey
+        String rowKey = userName.trim() + Constants.ROWKEY_SEPARATOR + createTime.trim();
+        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, rowKey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTEBOOKNAME, newNoteBookName);
+    }
+
     /*@Override
     public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
         // 从hbase获取笔记列表
         return dataDao.queryNoteListByRowKey(rowkey);
     }
-
-
-
-
-
-
 
     @Override
     public boolean deleteNoteBook(String oldNoteBookName, String userName,
@@ -252,68 +319,11 @@ public class NoteServiceImpl implements NoteService {
         return dataDao.deleteData(Constants.NOTEBOOK_TABLE_NAME, rowKey);
     }
 
-    *//**
-     * 重命名笔记本
-     *//*
-    @Override
-    public boolean updateNoteBook(String noteBookName, String oldNoteBookName,
-                                  String userName, String createTime, int status) {
-        boolean ifSucess = false;
-        ifSucess = renameNoteBookToRedis(noteBookName, oldNoteBookName,
-                userName, createTime, status);
-        if (ifSucess) {
-            try {
-                ifSucess = renameNoteBookToHbase(noteBookName, oldNoteBookName,
-                        userName, createTime, status);
-                if (!ifSucess) {
-                    renameNoteBookToRedis(oldNoteBookName, noteBookName,
-                            userName, createTime, status);
-                }
-            } catch (Exception e) {
-                renameNoteBookToRedis(oldNoteBookName, noteBookName, userName,
-                        createTime, status);
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return ifSucess;
-    }
 
-    public boolean renameNoteBookToRedis(String noteBookName,
-                                         String oldNoteBookName, String userName, String createTime,
-                                         int status) {
-        StringBuffer noteBookToString = new StringBuffer();
-        // 需要新增的信息
-        noteBookToString
-                .append(userName + Constants.ROWKEY_SEPARATOR
-                        + createTime.trim()).append(Constants.STRING_SEPARATOR)
-                .append(noteBookName).append(Constants.STRING_SEPARATOR)
-                .append(createTime).append(Constants.STRING_SEPARATOR)
-                .append(status);
-        // 需要删除的信息
-        StringBuffer oldNoteBookToString = new StringBuffer();
-        oldNoteBookToString
-                .append(userName + Constants.ROWKEY_SEPARATOR
-                        + createTime.trim()).append(Constants.STRING_SEPARATOR)
-                .append(oldNoteBookName).append(Constants.STRING_SEPARATOR)
-                .append(createTime).append(Constants.STRING_SEPARATOR)
-                .append(status);
-        // 先删后加
-        return redisDao.updateNotebookToRedis(userName,
-                oldNoteBookToString.toString(), noteBookToString.toString());
-    }
 
-    public boolean renameNoteBookToHbase(String newNoteBookName,
-                                         String oldNoteBookName, String userName, String createTime,
-                                         int status) {
-        // pingrowkey
-        String rowKey = userName.trim() + Constants.ROWKEY_SEPARATOR
-                + createTime.trim();
-        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, rowKey,
-                Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTEBOOKNAME,
-                newNoteBookName);
-    }
+
+
+
 
     @Override
     public boolean addNote(String noteRowKey, String noteName,

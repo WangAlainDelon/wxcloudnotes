@@ -240,6 +240,9 @@ function click_note(dom){
  * ===========================================================================================================================
  */
 $(function(){
+	/**解决jquery单机事件和双击事件冲突的问题*/
+    var timer = null;
+
 	/*
 	 *隐藏半透明背景
 	 *
@@ -301,37 +304,39 @@ $(function(){
 	 *ajax请求
 	 */
 	$('.col_1').on('click','.col_middle li',function(){
-		cleanEditor();
-		$(this).siblings()
-			.attr('class','book_list clear_float')
-			.end()
-			.attr('class','check_book clear_float');
-		$('.col_1 .col_bottom .check_bt').attr('class','col_li special');
-		//AJAX
-		$('.col_2').html(noteCan.note_my);
-		$('#addNote').data('noteBookRowKey',$(this));
-		var noteBookRowKey = $(this).data("noteBookRowKey");
-		$.ajax({
-			type : "post",
-			url : basePath +"note/getNoteListByNotebook",
-			async : false,
-			dataType : "json",
-			data: {"rowkey":noteBookRowKey},
-			success : function(data) {
-				//alert(data.allNoteBook);
-				if(data.noteList!=null){
-					var allNoteList = eval(data.noteList);
-					$.each(allNoteList,function(idx,item){ //循环对象取值
-						var title=addNote(item.name);
-						$('#my_note').prepend(title);
-						$('#my_note li:first').data('noteRowKey',item.rowKey);
-	          		 });
-				}
-			},
-			error:function(data) {
-				alert("no");
-			}
-		});
+		/**解决jquery单击双击事件冲突的问题*/
+        clearTimeout(timer);
+        cleanEditor();
+        $(this).siblings().attr('class','book_list clear_float').end().attr('class','check_book clear_float');
+        $('.col_1 .col_bottom .check_bt').attr('class','col_li special');
+        timer = setTimeout(function() {
+        	//在单击事件中添加一个setTimeout()函数，设置单击事件触发的时间间隔
+            //AJAX
+            $('.col_2').html(noteCan.note_my);
+            $('#addNote').data('noteBookRowKey',$(this));
+            var noteBookRowKey = $(this).data("noteBookRowKey");
+            $.ajax({
+                type : "post",
+                url : basePath +"note/getNoteListByNotebook",
+                async : false,
+                dataType : "json",
+                data: {"rowkey":noteBookRowKey},
+                success : function(data) {
+                    //alert(data.allNoteBook);
+                    if(data.noteList!=null){
+                        var allNoteList = eval(data.noteList);
+                        $.each(allNoteList,function(idx,item){ //循环对象取值
+                            var title=addNote(item.name);
+                            $('#my_note').prepend(title);
+                            $('#my_note li:first').data('noteRowKey',item.rowKey);
+                        });
+                    }
+                },
+                error:function(data) {
+                    alert("no");
+                }
+            });
+        }, 300);
 	});
 	/*
 	 *点击删除笔记本，弹出对话框
@@ -383,6 +388,8 @@ $(function(){
 	 *双击笔记本，弹出修改笔记本名称对话框
 	 */
 	$('.col_1').on('dblclick','.col_middle li',function(){
+        //双击事件
+        clearTimeout(timer); //在双击事件中，先清除前面click事件的时间处理
 		var dom=$(this);
 		$('.panel_can').html(panelCan.panel_renameNoteBook);
 		show_bg();
@@ -403,7 +410,7 @@ $(function(){
 			//AJAX
 			$.ajax({
 				type : "post",
-				url : basePath+"note/updateNoteBook",
+				url : basePath+"updateNoteBook",
 				async : false,
 				dataType : "json",
 				data: {"oldNoteBookName":oldName,"newNoteBookName":title,"rowKey":rowKey},

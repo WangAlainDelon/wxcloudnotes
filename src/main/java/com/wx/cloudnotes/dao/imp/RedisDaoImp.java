@@ -82,9 +82,22 @@ public class RedisDaoImp implements RedisDao {
         return true;
     }
 
+    /**
+     * 跟新笔记本名称的时候跟新到redis中
+     *
+     * @param username
+     * @param oldValue
+     * @param newValue
+     * @return
+     */
     @Override
-    public boolean updateNotebookToRedis(String key, String oldValue, String newValue) {
-        return false;
+    public boolean updateNotebookToRedis(String username, String oldValue, String newValue) {
+        redisTools.deleteValueOfList(username, 1, oldValue.trim());
+        Long returnSize = redisTools.appendRightList(username, newValue);
+        if (returnSize == 0) {
+            return false;
+        }
+        return true;
     }
 
     @Override

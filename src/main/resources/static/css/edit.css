@@ -31,7 +31,7 @@ hr{
  *
  */
 header{ height:60px; position:relative; border-bottom:1px solid #b5b5b5; z-index:888;
-	background-image:-webkit-linear-gradient(top,#fff,#d0d0d0);
+	background-image:-webkit-linear-gradient(top,#fff,#248aff);
 	background-image:-moz-linear-gradient(top,#fff,#d0d0d0);
 	background-image:-o-linear-gradient(top,#fff,#d0d0d0);
 	background-image:-ms-linear-gradient(top,#fff,#d0d0d0);
@@ -40,7 +40,7 @@ header{ height:60px; position:relative; border-bottom:1px solid #b5b5b5; z-index
 .logo{
 	height:60px;
 	width:250px;
-	/*background:url(../images/logo.png) 30px 5px no-repeat;*/
+	background:url(../images/logo.png) 30px 5px no-repeat;
 	float:left;
 	padding-left:30px;
 }
@@ -121,7 +121,7 @@ header{ height:60px; position:relative; border-bottom:1px solid #b5b5b5; z-index
 .col_1,.col_2,.col_3{
 	position:relative;
 	float:left;
-	/*height:500px;*/
+	/*height:870px;*/
 }
 /*
  *Wilson修改布局宽度
@@ -265,7 +265,7 @@ header{ height:60px; position:relative; border-bottom:1px solid #b5b5b5; z-index
 	height:50%;
 	width:50%;
 	z-index:3;
-	/*background:blue;*/
+/*	background:blue;*/
 }
 .panel_can{
 	position:absolute;

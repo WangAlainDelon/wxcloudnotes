@@ -30,7 +30,12 @@ public class NoteController {
         return "/note/inotecenter";
     }
 
-    /***/
+    /**
+     * 登陆成功后加载redis中对应用户的笔记本信息
+     *
+     * @param request
+     * @return
+     */
     @RequestMapping("/note/getAllNoteBook")
     public ModelAndView getAllNoteBook(HttpServletRequest request) {
         ModelAndView modelAndView = null;
@@ -89,4 +94,33 @@ public class NoteController {
         }
         return modelAndView;
     }
+
+    /**
+     * 修改笔记本名称
+     *
+     * @param oldNoteBookName 旧笔记本的名字
+     * @param newNoteBookName 新笔记本的名字
+     * @param rowKey          rowkey  wx@163.com_312312
+     * @return
+     */
+    @RequestMapping("/note/updateNoteBook")
+    public ModelAndView updateNoteBook(HttpServletRequest request,String oldNoteBookName, String newNoteBookName, String rowKey) {
+        ModelAndView modelAndView = null;
+        try {
+            // 分割row，取username和时间戳
+            String[] split = rowKey.split("\\" + Constants.ROWKEY_SEPARATOR);
+            // 重命名笔记本
+            boolean flag = noteService.updateNoteBook(newNoteBookName, oldNoteBookName, split[0], split[1], 0);
+            ModelMap map = new ModelMap();
+            map.put("success", flag);
+            modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
+        } catch (Exception e) {
+            String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+            Logger bussinessLogger = LogUtils.getBussinessLogger();
+            bussinessLogger.error("用户" + userName + "修改笔记本异常|方法:updateNoteBook|参数： oldNoteBookName:" + oldNoteBookName + ";newNoteBookName:" + newNoteBookName + ";rowKey:" + rowKey, e);
+            e.printStackTrace();
+        }
+        return modelAndView;
+    }
+
 }
