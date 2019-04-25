@@ -329,7 +329,7 @@ $(function () {
             var noteBookRowKey = $(this).data("noteBookRowKey");
             $.ajax({
                 type: "post",
-                url: basePath + "note/getNoteListByNotebook",
+                url: basePath + "getNoteListByNotebook",
                 async: false,
                 dataType: "json",
                 data: {"rowkey": noteBookRowKey},
@@ -463,7 +463,7 @@ $(function () {
             var flag;
             $.ajax({
                 type: "post",
-                url: basePath + "note/addNote",
+                url: basePath + "addNote",
                 async: false,
                 dataType: "json",
                 data: {"noteName": title, "noteBookRowkey": noteBookRowkey},
@@ -813,7 +813,7 @@ $(function () {
         var noteBookRowKey = $("#recycleBt").data("recycleBtRowKey");
         $.ajax({
             type: "post",
-            url: basePath + "note/getNoteListByNotebook",
+            url: basePath + "getNoteListByNotebook",
             async: false,
             dataType: "json",
             data: {"rowkey": noteBookRowKey},

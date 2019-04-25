@@ -340,20 +340,14 @@ public class NoteServiceImpl implements NoteService {
      */
     @Override
     public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
+        /***/
         return null;
     }
-
-
     /*@Override
     public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
         // 从hbase获取笔记列表
         return dataDao.queryNoteListByRowKey(rowkey);
     }
-
-
-
-
-
     public boolean deleteNoteBookFromHbase(String oldNoteBookName,
                                            String userName, String createTime, int status) {
         // 拼接rowkey
@@ -362,13 +356,6 @@ public class NoteServiceImpl implements NoteService {
         // 删除笔记本
         return dataDao.deleteData(Constants.NOTEBOOK_TABLE_NAME, rowKey);
     }
-
-
-
-
-
-
-
     @Override
     public boolean addNote(String noteRowKey, String noteName,
                            String createTime, String status, String noteBookRowkey) {
