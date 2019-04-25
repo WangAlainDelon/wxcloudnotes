@@ -72,34 +72,20 @@ public class DataDaoImpl implements DataDao {
         return hbaseTools.insertData(tableName, rowKey, famQuaVals);
     }
 
-    /**//**
+    /**
      * 根据rowKey删除数据
      * tableName：表名
      * rowKey：rowKey
      * IOException：IO异常
-     *//*
-	public boolean deleteData(String tableName, String rowKey)  {
-		Table table = null;
-		try {
-			table =  Constants.CONNECTION.getTable(TableName.valueOf(tableName));
-			Delete del = new Delete(Bytes.toBytes(rowKey));// 创建delete类，存入要删除的rowKey
-			table.delete(del);// 删除数据
-			table.flushCommits();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}finally{
-			try {
-				table.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return true;
-		
-	}
+     */
+    public boolean deleteData(String tableName, String rowKey, String lieZu) {
+        return hbaseTools.deleteData(tableName, rowKey, lieZu);
+    }
 
-	*//**
+
+    /**
+
+     *//**
      * 查询所有数据
      *  tableName：表名
      *  ResultScanner:结果列表

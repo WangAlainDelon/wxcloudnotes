@@ -36,6 +36,13 @@ public class HbaseTools {
 
     /**
      * 添加数据,单条添加
+     *
+     * @param tableName
+     * @param rowKey
+     * @param lieZu
+     * @param lie
+     * @param value
+     * @return
      */
     public boolean inserData(String tableName, String rowKey, String lieZu, String lie, String value) {
         try {
@@ -49,12 +56,13 @@ public class HbaseTools {
 
     /**
      * 添加笔记本的时插入hbase的操作
+     *
      * @param tableName
      * @param rowKey
      * @param famQuaVals
      * @return
      */
-    public boolean insertData(String tableName, String rowKey, String[][] famQuaVals){
+    public boolean insertData(String tableName, String rowKey, String[][] famQuaVals) {
         try {
             for (int i = 0; i < famQuaVals.length; i++) {
                 /*
@@ -65,8 +73,8 @@ public class HbaseTools {
                  *
                  * */
                 //famQuaVals[i][2]就是value
-                if (famQuaVals[i][2]!=null) {
-                    hbaseTemplate.put(tableName, rowKey, famQuaVals[i][0], famQuaVals[i][1],Bytes.toBytes(famQuaVals[i][2]));
+                if (famQuaVals[i][2] != null) {
+                    hbaseTemplate.put(tableName, rowKey, famQuaVals[i][0], famQuaVals[i][1], Bytes.toBytes(famQuaVals[i][2]));
                 }
             }
             return true;
@@ -75,6 +83,26 @@ public class HbaseTools {
             return false;
         }
     }
+
+    /**
+     * 删除hbase中的数据
+     *
+     * @param tableName
+     * @param rowKey
+     * @param lieZu
+     * @return
+     */
+    public boolean deleteData(String tableName, String rowKey, String lieZu) {
+        try {
+            hbaseTemplate.delete(tableName, rowKey, lieZu);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
     /**
      * 查询数据
      */

@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import com.wx.cloudnotes.common.Constants;
 import com.wx.cloudnotes.dao.DataDao;
 import com.wx.cloudnotes.dao.RedisDao;
+import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.service.NoteService;
 import net.sf.json.JSONArray;
@@ -186,6 +187,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * 根据用户名删除redis中笔记本的信息
+     *
      * @param oldNoteBookName
      * @param userName
      * @param createTime
@@ -207,6 +209,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * 重命名笔记本
+     *
      * @param noteBookName
      * @param oldNoteBookName
      * @param userName
@@ -235,6 +238,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * 重命名redis中的笔记本名字
+     *
      * @param noteBookName
      * @param oldNoteBookName
      * @param userName
@@ -265,6 +269,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * 重命名hbase中的笔记本名字
+     *
      * @param newNoteBookName
      * @param oldNoteBookName
      * @param userName
@@ -278,35 +283,74 @@ public class NoteServiceImpl implements NoteService {
         return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, rowKey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTEBOOKNAME, newNoteBookName);
     }
 
+    /**
+     * 删除笔记本
+     *
+     * @param noteBookName
+     * @param userName
+     * @param createTime
+     * @param i
+     * @return
+     */
+    @Override
+    public boolean deleteNoteBook(String noteBookName, String userName, String createTime, int i) {
+        boolean ifSuccess = false;
+        boolean delRedis = deleteNoteBookFromRedis(noteBookName, userName, createTime, i);
+        if (delRedis) {
+            try {
+                boolean delHbase = deleteNoteBookFromHbase(noteBookName, userName, createTime, i);
+                if (delHbase) {
+                    ifSuccess = true;
+                } else {
+                    //如果删除hbase失败了，应该把redis的数据还原回去,如果这里添加失败了，redis的数据就和hbase数据不一致
+                    boolean b = addNoteBookToRedis(noteBookName, userName, createTime, i);
+                }
+
+            } catch (Exception e) {
+                boolean b = addNoteBookToRedis(noteBookName, userName, createTime, i);
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return ifSuccess;
+    }
+
+    /**
+     * 删除hbase中的笔记本信息
+     *
+     * @param noteBookName
+     * @param userName
+     * @param createTime
+     * @param status
+     * @return
+     */
+    private boolean deleteNoteBookFromHbase(String noteBookName, String userName, String createTime, int status) {
+        //拼接rowKey
+        StringBuffer rowKey = new StringBuffer();
+        rowKey.append(userName.trim() + Constants.ROWKEY_SEPARATOR)
+                .append(createTime.trim());
+        return dataDao.deleteData(Constants.NOTEBOOK_TABLE_NAME, rowKey.toString(), Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO);
+    }
+
+    /***
+     * 查询一个笔记本下的所有笔记
+     * @param rowkey
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
+        return null;
+    }
+
+
     /*@Override
     public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
         // 从hbase获取笔记列表
         return dataDao.queryNoteListByRowKey(rowkey);
     }
 
-    @Override
-    public boolean deleteNoteBook(String oldNoteBookName, String userName,
-                                  String createTime, int status) {
-        boolean ifSucess = false;
-        ifSucess = deleteNoteBookFromRedis(oldNoteBookName, userName,
-                createTime, status);
-        if (ifSucess) {
-            try {
-                ifSucess = deleteNoteBookFromHbase(oldNoteBookName, userName,
-                        createTime, status);
-                if (!ifSucess) {
-                    addNoteBookToRedis(oldNoteBookName, userName, createTime,
-                            status);
-                }
-            } catch (Exception e) {
-                addNoteBookToRedis(oldNoteBookName, userName, createTime,
-                        status);
-                e.printStackTrace();
-                return false;
-            }
-        }
-        return ifSucess;
-    }
+
 
 
 

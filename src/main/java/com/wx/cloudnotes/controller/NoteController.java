@@ -2,6 +2,7 @@ package com.wx.cloudnotes.controller;
 
 import com.wx.cloudnotes.common.Constants;
 import com.wx.cloudnotes.common.WxResult;
+import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.service.NoteService;
 import com.wx.cloudnotes.utils.log.LogUtils;
@@ -104,7 +105,7 @@ public class NoteController {
      * @return
      */
     @RequestMapping("/note/updateNoteBook")
-    public ModelAndView updateNoteBook(HttpServletRequest request,String oldNoteBookName, String newNoteBookName, String rowKey) {
+    public ModelAndView updateNoteBook(HttpServletRequest request, String oldNoteBookName, String newNoteBookName, String rowKey) {
         ModelAndView modelAndView = null;
         try {
             // 分割row，取username和时间戳
@@ -118,6 +119,47 @@ public class NoteController {
             String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
             Logger bussinessLogger = LogUtils.getBussinessLogger();
             bussinessLogger.error("用户" + userName + "修改笔记本异常|方法:updateNoteBook|参数： oldNoteBookName:" + oldNoteBookName + ";newNoteBookName:" + newNoteBookName + ";rowKey:" + rowKey, e);
+            e.printStackTrace();
+        }
+        return modelAndView;
+    }
+
+    /**
+     * 删除笔记本
+     *
+     * @param request
+     * @param noteBookName
+     * @param rowKey
+     * @return
+     */
+    @RequestMapping("/note/deleteNoteBook")
+    public ModelAndView deleteNoteBook(HttpServletRequest request, String noteBookName, String rowKey) {
+        ModelAndView modelAndView = null;  //wx@163.com_312312|java基础|123213|0
+        try {
+            ModelMap map = new ModelMap();
+            //首先判断笔记本中是否有笔记，如果有笔记那么提示先删除笔记再删除笔记本
+            List<Note> noteListByNotebook = noteService.getNoteListByNotebook(rowKey);
+            if (noteListByNotebook != null && noteListByNotebook.size() > 0) {
+                map.put("success", false);
+                map.put("message", "该笔记本中有笔记，请先删除笔记！");
+                modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
+                return modelAndView;
+            } else {
+                String[] split = rowKey.split("\\" + Constants.ROWKEY_SEPARATOR);
+                boolean re = noteService.deleteNoteBook(noteBookName, split[0], split[1], 0);
+                if (re) {
+                    map.put("message", "删除成功！");
+                } else {
+                    map.put("message", "删除失败！");
+                }
+                map.put("success", re);
+                modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
+            }
+
+        } catch (Exception e) {
+            String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+            Logger bussinessLogger = LogUtils.getBussinessLogger();
+            bussinessLogger.error("用户" + userName + "删除笔记本异常|方法:deleteNoteBook|参数： noteBookName:" + noteBookName + ";rowKey:" + rowKey, e);
             e.printStackTrace();
         }
         return modelAndView;

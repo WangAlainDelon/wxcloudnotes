@@ -11,17 +11,18 @@ import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 
 
 public interface NoteService {
-    public List<NoteBook> getAllNoteBook(String userIdAndName) throws IOException;
+    List<NoteBook> getAllNoteBook(String userIdAndName) throws IOException;
 
     boolean addNoteBook(String noteBookName, String userName, String createTime, int status) throws IOException;
 
     boolean updateNoteBook(String newNoteBookName, String oldNoteBookName, String userName, String createTime, int status);
 
-    /*
+    boolean deleteNoteBook(String noteBookName, String userName, String createTime, int i);
+
     public List<Note> getNoteListByNotebook(String rowkey) throws IOException;
 
-    boolean deleteNoteBook(String noteBookName, String userName, String createTime,
-                           int i);
+    /*
+
     boolean addNote(String noteRowKey, String noteName, String createTime, String status, String noteBookRowkey);
 
     boolean deleteNote(String noteRowKey, String string, String string2,
