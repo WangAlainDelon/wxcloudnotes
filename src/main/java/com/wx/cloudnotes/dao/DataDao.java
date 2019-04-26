@@ -14,21 +14,25 @@ public interface DataDao {
     public ResultScanner querySome(String tableName, List<String> rowKeys)
             throws IOException;*/
 
-    public boolean insertData(String tableName, String rowKey, String family, String qualifier, String value);
+    boolean insertData(String tableName, String rowKey, String family, String qualifier, String value);
 
-    public boolean insertData(String tableName, String rowKey, String[][] famQuaVals);
+    boolean insertData(String tableName, String rowKey, String[][] famQuaVals);
 
-    public List<Result> queryByReg(String tableName, String reg) throws IOException;
+    List<Result> queryByReg(String tableName, String reg) throws IOException;
 
-    public boolean deleteData(String tableName, String rowKey, String family);
+    boolean deleteData(String tableName, String rowKey, String family);
+
+    List<Note> queryNoteListByRowKey(String noteBookRowkey);
+
+    List<String> queryByRowKeyString(String notebookTableName, String noteBookRowkey);
+
+    Note queryNoteByRowKey(String noteRowkey);
+
    /* public void copyData(String fromTableName, String toTableName, String fromRowKey, String toRowKey) throws IOException;
 
-    public List<String> queryByRowKeyString(String notebookTableName,
-                                            String noteBookRowkey);
 
-    public Note queryNoteByRowKey(String noteRowkey);
 
-    public List<Note> queryNoteListByRowKey(String rowkey);
+
 
     public Result queryByRowKey(String noteTableName, String rowKey);*/
 }

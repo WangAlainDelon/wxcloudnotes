@@ -19,23 +19,22 @@ public interface NoteService {
 
     boolean deleteNoteBook(String noteBookName, String userName, String createTime, int i);
 
-    public List<Note> getNoteListByNotebook(String rowkey) throws IOException;
-
-    /*
+    List<Note> getNoteListByNotebook(String noteBookRowkey) throws IOException;
 
     boolean addNote(String noteRowKey, String noteName, String createTime, String status, String noteBookRowkey);
 
+    Note getNoteByRowKey(String noteRowkey) throws Exception;
+
+    boolean updateNote(String noteRowKey, String noteName, String createTime, String content, String status, String oldNoteName, String noteBookRowkey);
+
+    /*
     boolean deleteNote(String noteRowKey, String string, String string2,
                        String oldNoteName, String noteBookRowkey);
 
-    boolean updateNote(String noteRowKey, String noteName, String string,
-                       String content, String string2, String oldNoteName,
-                       String noteBookRowkey);
+
 
     boolean moveAndDeleteNote(String noteRowKey, String oldNoteBookRowkey,
                               String newNoteBookRowkey, String noteName);
-
-    Note getNoteByRowKey(String noteRowkey) throws Exception;
 
     boolean shareNote(String rowKey) throws CorruptIndexException, IOException;
 

@@ -321,12 +321,12 @@ $(function () {
         cleanEditor();
         $(this).siblings().attr('class', 'book_list clear_float').end().attr('class', 'check_book clear_float');
         $('.col_1 .col_bottom .check_bt').attr('class', 'col_li special');
+        $('.col_2').html(noteCan.note_my);
+        $('#addNote').data('noteBookRowKey', $(this));
+        var noteBookRowKey = $(this).data("noteBookRowKey");
         timer = setTimeout(function () {
             //在单击事件中添加一个setTimeout()函数，设置单击事件触发的时间间隔
             //AJAX
-            $('.col_2').html(noteCan.note_my);
-            $('#addNote').data('noteBookRowKey', $(this));
-            var noteBookRowKey = $(this).data("noteBookRowKey");
             $.ajax({
                 type: "post",
                 url: basePath + "getNoteListByNotebook",
@@ -386,12 +386,12 @@ $(function () {
                 } else {
                     $('.cancle').trigger('click');
                     show_success($('.alert_success_b'), data.message);
-
+                    alert(data.message);
                 }
 
             },
             error: function (data) {
-                //alert("no");
+                alert(data.message);
             }
         });
 
@@ -489,12 +489,12 @@ $(function () {
      *单击笔记,获取笔记详情
      *#my_note
      */
-    $('.col_2').on('click', '.#my_note li', function () {
+    $('.col_2').on('click', '#my_note li', function () {
         var dom = $(this);
         var noteRowKey = dom.data('noteRowKey');
         $.ajax({
             type: "post",
-            url: basePath + "note/getNote",
+            url: basePath + "/getNote",
             async: false,
             dataType: "json",
             data: {"noteRowkey": noteRowKey},
@@ -504,6 +504,7 @@ $(function () {
                 if (flag) {
                     $('#saveNote').data({
                         saveNote: dom
+
                     });
                     click_note(dom);
                     //AJAX
@@ -513,10 +514,13 @@ $(function () {
                     $('#viewNote').hide();
                     $('#editNote').show();
                     editor.html(data.note.content);
+                } else {
+                    alert(data.message);
                 }
 
             },
             error: function (data) {
+                alert(data.message);
             }
         });
     });
@@ -597,10 +601,13 @@ $(function () {
                 if (flag) {
                     $('.alert_can').data('deleteNote').remove();
                     $('.cancle').trigger('click');
+                } else {
+                    alert(data.message);
                 }
 
             },
             error: function (data) {
+                alert(data.message);
             }
         });
     });
@@ -665,7 +672,7 @@ $(function () {
             if (length > 0) {
                 noteName = formate(newNoteName);
                 var oldNoteName = dom.data('saveNote').text();
-                //alert(dom.data('saveNote').data('noteRowKey'));
+                /*  alert(dom.data('saveNote').data('noteRowKey'));*/
                 var noteRowKey = dom.data('saveNote').data('noteRowKey');
                 var noteBookRowkey = $('#addNote').data('noteBookRowKey').data('noteBookRowKey');
                 var content = editor.html();
@@ -676,7 +683,7 @@ $(function () {
                 //AJAX
                 $.ajax({
                     type: "post",
-                    url: basePath + "note/updateNote",
+                    url: basePath + "updateNote",
                     async: false,
                     dataType: "json",
                     data: {
@@ -697,9 +704,12 @@ $(function () {
                                 .children('span').html(newNoteName);
                             show_success($('.alert_success_b'), '保存成功');
                         }
+                        else {
+                            alert(data.messsage);
+                        }
                     },
                     error: function (data) {
-                        //alert("no");
+                        alert(data.messsage);
                     }
                 });
             }

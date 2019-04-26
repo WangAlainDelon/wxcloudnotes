@@ -14,12 +14,14 @@ import com.wx.cloudnotes.dao.RedisDao;
 import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.service.NoteService;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.lucene.index.CorruptIndexException;
 /*import org.apache.lucene.queryParser.ParseException;*/
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
@@ -334,15 +336,220 @@ public class NoteServiceImpl implements NoteService {
 
     /***
      * 查询一个笔记本下的所有笔记
-     * @param rowkey
+     * @param noteBookRowkey
      * @return
      * @throws IOException
      */
     @Override
-    public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
-        /***/
-        return null;
+    public List<Note> getNoteListByNotebook(String noteBookRowkey) throws IOException {
+        /**从hbase中拿到笔记的信息*/
+        return dataDao.queryNoteListByRowKey(noteBookRowkey);
     }
+
+    /**
+     * 添加笔记
+     *
+     * @param noteRowKey
+     * @param noteName
+     * @param createTime
+     * @param status
+     * @param noteBookRowkey
+     * @return
+     */
+    @Override
+    public boolean addNote(String noteRowKey, String noteName, String createTime, String status, String noteBookRowkey) {
+        /**首先将笔记的名字插入笔记本表中，拿到笔记本表中所有的笔记，然后将这个笔记添加到最后
+         * 其次将笔记的信息保存到笔记的表中
+         * */
+        boolean ifSucess = false;
+        // 查询旧的笔记列表
+        List<String> noteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey);
+        ifSucess = addNoteToNoteList(noteRowKey, noteName, createTime, status, noteBookRowkey, noteList);
+        if (ifSucess) {
+            try {
+                //如果修改nb(笔记本表)成功，就将笔记的信息添加到n(笔记表)中
+                ifSucess = addNoteToOrderTable(noteRowKey, noteName, createTime, status, noteBookRowkey);
+                if (!ifSucess) {
+                    //如果插入笔记表失败，那么还原笔记本表
+                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey,
+                            Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
+                            Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST,
+                            JSONArray.fromObject(noteList).toString());
+                }
+            } catch (Exception e) {
+                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
+                        noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
+                        Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray
+                                .fromObject(noteList).toString());
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return ifSucess;
+    }
+
+    /**
+     * 添加笔记的名字到笔记本表的笔记名字列表中
+     *
+     * @param noteRowKey
+     * @param noteName
+     * @param createTime
+     * @param status
+     * @param noteBookRowkey
+     * @param noteList
+     * @return
+     */
+    public boolean addNoteToNoteList(String noteRowKey, String noteName, String createTime, String status, String noteBookRowkey, List<String> noteList) {
+        if (noteList == null) {
+            noteList = new ArrayList<String>();
+        }
+        // 拼装新的笔记信息
+        StringBuffer noteBookToString = new StringBuffer();
+        noteBookToString.append(noteRowKey).append(Constants.STRING_SEPARATOR)
+                .append(noteName).append(Constants.STRING_SEPARATOR)
+                .append(createTime).append(Constants.STRING_SEPARATOR)
+                .append(status);
+        // 添加到笔记列表
+        noteList.add(noteBookToString.toString());
+        JSONArray jsonarray = JSONArray.fromObject(noteList);// list转json
+        String noteListToJson = jsonarray.toString();// list转json
+        // 修改笔记本中的笔记list信息
+        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, noteListToJson);
+    }
+
+    /**
+     * 添加笔记到n(笔记表中)
+     *
+     * @param noteRowKey
+     * @param noteName
+     * @param createTime
+     * @param status
+     * @param noteBookRowkey
+     * @return
+     */
+    public boolean addNoteToOrderTable(String noteRowKey, String noteName, String createTime, String status, String noteBookRowkey) {
+        // 封装笔记信息
+        String noteFamQuaVals[][] = new String[4][3];
+        noteFamQuaVals[0][0] = Constants.NOTE_FAMLIY_NOTEINFO;
+        noteFamQuaVals[0][1] = Constants.NOTE_NOTEINFO_CLU_NOTENAME;
+        noteFamQuaVals[0][2] = noteName;
+        noteFamQuaVals[1][0] = Constants.NOTE_FAMLIY_NOTEINFO;
+        noteFamQuaVals[1][1] = Constants.NOTE_NOTEINFO_CLU_STATUS;
+        noteFamQuaVals[1][2] = status;
+        noteFamQuaVals[2][0] = Constants.NOTE_FAMLIY_NOTEINFO;
+        noteFamQuaVals[2][1] = Constants.NOTE_NOTEINFO_CLU_CREATETIME;
+        noteFamQuaVals[2][2] = createTime;
+        noteFamQuaVals[3][0] = Constants.NOTE_FAMLIY_CONTENTINFO;
+        noteFamQuaVals[3][1] = Constants.NOTE_CONTENTINFO_CLU_CONTENT;
+        noteFamQuaVals[3][2] = "";
+        return dataDao.insertData(Constants.NOTE_TABLE_NAME, noteRowKey, noteFamQuaVals);
+    }
+
+    /**
+     * 根据noteRowkey查询笔记的详情
+     *
+     * @param noteRowkey
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Note getNoteByRowKey(String noteRowkey) throws Exception {
+        return dataDao.queryNoteByRowKey(noteRowkey);
+    }
+
+    /**
+     * 保存笔记
+     *
+     * @param noteRowKey
+     * @param noteName
+     * @param createTime
+     * @param content
+     * @param status
+     * @param oldNoteName
+     * @param noteBookRowkey
+     * @return
+     */
+    @Override
+    public boolean updateNote(String noteRowKey, String noteName, String createTime, String content, String status, String oldNoteName, String noteBookRowkey) {
+        /**事务控制，首先如果笔记的名字变了要保存到nb(笔记本表)，如果成功，将笔记的内容保存到n(笔记)，如果失败，将还原笔记本表*/
+        //查询笔记本表，返回旧的笔记列表
+        List<String> noteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey);
+        boolean ifSuccess = false;
+        ifSuccess = updateNoteListFromNoteBookTable(noteRowKey, noteName, createTime, content, status, oldNoteName, noteBookRowkey, noteList);
+        if (ifSuccess) {
+            try {
+                //继续更新n(笔记表)
+                boolean saveN = updateNoteFromNoteTable(noteRowKey, noteName, createTime, content, status);
+                if (saveN) {
+                    return true;
+                } else {
+                    //恢复笔记本表的信息
+                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray.fromObject(noteList).toString());
+                }
+            } catch (Exception e) {
+                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray.fromObject(noteList).toString());
+            }
+        }
+        return ifSuccess;
+    }
+
+    /**
+     * 更新笔记列表到笔记本表
+     *
+     * @param noteRowKey
+     * @param noteName
+     * @param createTime
+     * @param content
+     * @param status
+     * @param oldNoteName
+     * @param noteBookRowkey
+     * @param noteList
+     * @return
+     */
+    private boolean updateNoteListFromNoteBookTable(String noteRowKey, String noteName, String createTime, String content, String status, String oldNoteName, String noteBookRowkey, List<String> noteList) {
+        if (noteList == null) {
+            noteList = new ArrayList<String>();
+        }
+        //拼接新的笔记信息
+        StringBuffer noteString = new StringBuffer();
+        noteString.append(noteRowKey.trim()).append(Constants.STRING_SEPARATOR).append(noteName.trim())
+                .append(Constants.STRING_SEPARATOR).append(createTime.trim()).append(Constants.STRING_SEPARATOR)
+                .append(status.trim());
+        noteList.add(noteString.toString());
+        JSONArray jsonArray = JSONArray.fromObject(noteList);
+        String jsonValue = jsonArray.toString();
+        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, jsonValue);
+    }
+
+    /**
+     * 保存笔记到笔记表（n）
+     *
+     * @param noteRowKey
+     * @param noteName
+     * @param createTime
+     * @param content
+     * @param status
+     * @return
+     */
+    private boolean updateNoteFromNoteTable(String noteRowKey, String noteName, String createTime, String content, String status) {
+        String noteFamQuaVals[][] = new String[4][3];
+        noteFamQuaVals[0][0] = Constants.NOTE_FAMLIY_NOTEINFO;
+        noteFamQuaVals[0][1] = Constants.NOTE_NOTEINFO_CLU_NOTENAME;
+        noteFamQuaVals[0][2] = noteName;
+        noteFamQuaVals[1][0] = Constants.NOTE_FAMLIY_NOTEINFO;
+        noteFamQuaVals[1][1] = Constants.NOTE_NOTEINFO_CLU_STATUS;
+        noteFamQuaVals[1][2] = status;
+        noteFamQuaVals[2][0] = Constants.NOTE_FAMLIY_NOTEINFO;
+        noteFamQuaVals[2][1] = Constants.NOTE_NOTEINFO_CLU_CREATETIME;
+        noteFamQuaVals[2][2] = createTime;
+        noteFamQuaVals[3][0] = Constants.NOTE_FAMLIY_CONTENTINFO;
+        noteFamQuaVals[3][1] = Constants.NOTE_CONTENTINFO_CLU_CONTENT;
+        noteFamQuaVals[3][2] = content;
+        return dataDao.insertData(Constants.NOTE_TABLE_NAME, noteRowKey, noteFamQuaVals);
+    }
+
+
+
     /*@Override
     public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
         // 从hbase获取笔记列表
@@ -388,47 +595,8 @@ public class NoteServiceImpl implements NoteService {
         return ifSucess;
     }
 
-    public boolean addNoteToNoteList(String noteRowKey, String noteName,
-                                     String createTime, String status, String noteBookRowkey,
-                                     List<String> noteList) {
-        if (noteList == null) {
-            noteList = new ArrayList<String>();
-        }
-        // 拼装新的笔记信息
-        StringBuffer noteBookToString = new StringBuffer();
-        noteBookToString.append(noteRowKey).append(Constants.STRING_SEPARATOR)
-                .append(noteName).append(Constants.STRING_SEPARATOR)
-                .append(createTime).append(Constants.STRING_SEPARATOR)
-                .append(status);
-        // 添加到笔记列表
-        noteList.add(noteBookToString.toString());
-        JSONArray jsonarray = JSONArray.fromObject(noteList);// list转json
-        String noteListToJson = jsonarray.toString();// list转json
-        // 修改笔记本中的笔记list信息
-        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
-                noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, noteListToJson);
-    }
 
-    public boolean addNoteToOrderTable(String noteRowKey, String noteName,
-                                       String createTime, String status, String noteBookRowkey) {
-        // 封装笔记信息
-        String noteFamQuaVals[][] = new String[4][3];
-        noteFamQuaVals[0][0] = Constants.NOTE_FAMLIY_NOTEINFO;
-        noteFamQuaVals[0][1] = Constants.NOTE_NOTEINFO_CLU_NOTENAME;
-        noteFamQuaVals[0][2] = noteName;
-        noteFamQuaVals[1][0] = Constants.NOTE_FAMLIY_NOTEINFO;
-        noteFamQuaVals[1][1] = Constants.NOTE_NOTEINFO_CLU_STATUS;
-        noteFamQuaVals[1][2] = status;
-        noteFamQuaVals[2][0] = Constants.NOTE_FAMLIY_NOTEINFO;
-        noteFamQuaVals[2][1] = Constants.NOTE_NOTEINFO_CLU_CREATETIME;
-        noteFamQuaVals[2][2] = createTime;
-        noteFamQuaVals[3][0] = Constants.NOTE_FAMLIY_CONTENTINFO;
-        noteFamQuaVals[3][1] = Constants.NOTE_CONTENTINFO_CLU_CONTENT;
-        noteFamQuaVals[3][2] = "";
-        return dataDao.insertData(Constants.NOTE_TABLE_NAME, noteRowKey,
-                noteFamQuaVals);
-    }
+
 
     @Override
     public boolean deleteNote(String noteRowKey, String createTime,

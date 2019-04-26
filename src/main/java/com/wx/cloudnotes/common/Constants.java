@@ -54,5 +54,4 @@ public class Constants {
     public static final String STRING_SEPARATOR = "|" ;
     public static final String ROWKEY_SEPARATOR = "_" ;//rowkey的分隔符
 
-
 }

@@ -65,7 +65,7 @@ public class HbaseTools {
     public boolean insertData(String tableName, String rowKey, String[][] famQuaVals) {
         try {
             for (int i = 0; i < famQuaVals.length; i++) {
-                /*
+                /*       笔记本的二维数组，当然还有比较的二维数组也是用这个公共的方法
                  *       nbi(列族1，笔记本信息)  nbn（列1，笔记本名字）         noteBookName
                  *       nbi(列族1，笔记本信息)  ct(列2：创建笔记本时间)        createTime
                  *       nbi(列族1，笔记本信息)  st（列3：笔记本状态）          status
@@ -102,6 +102,27 @@ public class HbaseTools {
         }
     }
 
+    /**
+     * 根据rowkey来查询数据
+     *
+     * @param tableName
+     * @param rowKeys
+     * @param familyColumn
+     * @param column
+     * @return
+     */
+    public List<Result> getListRowkeyData(String tableName, List<String> rowKeys, String familyColumn, String column) {
+        return rowKeys.stream().map(rk -> {
+            if (StringUtils.isNotBlank(familyColumn)) {
+                if (StringUtils.isNotBlank(column)) {
+                    return hbaseTemplate.get(tableName, rk, familyColumn, column, (rowMapper, rowNum) -> rowMapper);
+                } else {
+                    return hbaseTemplate.get(tableName, rk, familyColumn, (rowMapper, rowNum) -> rowMapper);
+                }
+            }
+            return hbaseTemplate.get(tableName, rk, (rowMapper, rowNum) -> rowMapper);
+        }).collect(Collectors.toList());
+    }
 
     /**
      * 查询数据
@@ -124,20 +145,6 @@ public class HbaseTools {
         return hbaseTemplate.find(tableName, scan, (rowMapper, rowNum) -> rowMapper);
 
     }
-
-    public List<Result> getListRowkeyData(String tableName, List<String> rowKeys, String familyColumn, String column) {
-        return rowKeys.stream().map(rk -> {
-            if (StringUtils.isNotBlank(familyColumn)) {
-                if (StringUtils.isNotBlank(column)) {
-                    return hbaseTemplate.get(tableName, rk, familyColumn, column, (rowMapper, rowNum) -> rowMapper);
-                } else {
-                    return hbaseTemplate.get(tableName, rk, familyColumn, (rowMapper, rowNum) -> rowMapper);
-                }
-            }
-            return hbaseTemplate.get(tableName, rk, (rowMapper, rowNum) -> rowMapper);
-        }).collect(Collectors.toList());
-    }
-    /***/
 
 
 }

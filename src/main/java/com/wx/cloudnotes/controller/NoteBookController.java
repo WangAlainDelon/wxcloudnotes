@@ -168,17 +168,29 @@ public class NoteBookController {
     /**
      * 单击笔记本的时候查询该笔记本下所有的笔记
      *
-     * @param rowkey wx@163.com_312312
+     * @param rowkey rowkey为noteBook的rowkey  wx@163.com_312312
      * @return
      */
     @RequestMapping("/note/getNoteListByNotebook")
-    public ModelAndView getNoteListByNotebook(String rowkey) {
+    public ModelAndView getNoteListByNotebook(HttpServletRequest request, String rowkey) {
         ModelAndView modelAndView = null;
-        try {
-            List<Note> noteListByNotebook = noteService.getNoteListByNotebook(rowkey);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        List<Note> noteListByNotebook = null;
+        if (rowkey != null || !"".equals(rowkey)) {
+            try {
+                noteListByNotebook = noteService.getNoteListByNotebook(rowkey);
+                ModelMap modelMap = new ModelMap();
+                modelMap.put("noteList", noteListByNotebook);
+                modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
+            } catch (Exception e) {
+                Logger logger = LogUtils.getBussinessLogger();
+                String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+                logger.error("用户" + userName + "获取笔记本的笔记异常|方法getNoteListByNotebook|参数:rowkey:" + rowkey, e);
+                e.printStackTrace();
+            }
+        } else {
+            ModelMap modelMap = new ModelMap();
+            modelMap.put("noteList", noteListByNotebook);
+            modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
         }
         return modelAndView;
     }
