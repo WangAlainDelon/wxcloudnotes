@@ -128,9 +128,11 @@ public class DataDaoImpl implements DataDao {
         if (rowkeyData != null) {
             for (Result rowkeyDatum : rowkeyData) {
                 byte[] value = rowkeyDatum.getValue(Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO.getBytes(), Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST.getBytes());
-                String str = new String(value);
-                //将json转化为list
-                list = JsonUtil.changeStringToListString(str);
+                if (value != null){
+                    String str = new String(value);
+                    //将json转化为list
+                    list = JsonUtil.changeStringToListString(str);
+                }
             }
         }
         return list;

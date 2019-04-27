@@ -27,6 +27,8 @@ public interface NoteService {
 
     boolean updateNote(String noteRowKey, String noteName, String createTime, String content, String status, String oldNoteName, String noteBookRowkey);
 
+    boolean moveAndDeleteNote(String noteRowKey, String oldNoteBookRowkey, String newNoteBookRowkey, String noteName);
+
     /*
     boolean deleteNote(String noteRowKey, String string, String string2,
                        String oldNoteName, String noteBookRowkey);

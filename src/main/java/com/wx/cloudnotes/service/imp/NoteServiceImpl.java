@@ -515,6 +515,14 @@ public class NoteServiceImpl implements NoteService {
         noteString.append(noteRowKey.trim()).append(Constants.STRING_SEPARATOR).append(noteName.trim())
                 .append(Constants.STRING_SEPARATOR).append(createTime.trim()).append(Constants.STRING_SEPARATOR)
                 .append(status.trim());
+        //拼接旧的笔记信息，将旧的笔记信息从list集合移除再添加新的
+        StringBuffer oldNoteString = new StringBuffer();
+        oldNoteString.append(noteRowKey.trim()).append(Constants.STRING_SEPARATOR).append(oldNoteName.trim())
+                .append(Constants.STRING_SEPARATOR).append(createTime.trim()).append(Constants.STRING_SEPARATOR)
+                .append(status.trim());
+
+        boolean remove = noteList.remove(oldNoteString.toString().trim());
+
         noteList.add(noteString.toString());
         JSONArray jsonArray = JSONArray.fromObject(noteList);
         String jsonValue = jsonArray.toString();
@@ -548,53 +556,69 @@ public class NoteServiceImpl implements NoteService {
         return dataDao.insertData(Constants.NOTE_TABLE_NAME, noteRowKey, noteFamQuaVals);
     }
 
-
-
-    /*@Override
-    public List<Note> getNoteListByNotebook(String rowkey) throws IOException {
-        // 从hbase获取笔记列表
-        return dataDao.queryNoteListByRowKey(rowkey);
-    }
-    public boolean deleteNoteBookFromHbase(String oldNoteBookName,
-                                           String userName, String createTime, int status) {
-        // 拼接rowkey
-        String rowKey = userName.trim() + Constants.ROWKEY_SEPARATOR
-                + createTime.trim();
-        // 删除笔记本
-        return dataDao.deleteData(Constants.NOTEBOOK_TABLE_NAME, rowKey);
-    }
+    /**
+     * 移动并删除笔记
+     *
+     * @param noteRowKey
+     * @param oldNoteBookRowkey
+     * @param newNoteBookRowkey
+     * @param noteName
+     * @return
+     */
     @Override
-    public boolean addNote(String noteRowKey, String noteName,
-                           String createTime, String status, String noteBookRowkey) {
-        boolean ifSucess = false;
-        // 查询旧的笔记列表
-        List<String> noteList = dataDao.queryByRowKeyString(
-                Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey);
-        ifSucess = addNoteToNoteList(noteRowKey, noteName, createTime, status,
-                noteBookRowkey, noteList);
-        if (ifSucess) {
+    public boolean moveAndDeleteNote(String noteRowKey, String oldNoteBookRowkey, String newNoteBookRowkey, String noteName) {
+        // 查询旧笔记本下的笔记信息，旧笔记本下的信息能够查询到
+        List<String> oldNoteBookNoteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, oldNoteBookRowkey);
+        // 查询新笔记本下的笔记信息
+        List<String> newNoteBookNoteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, newNoteBookRowkey);
+        // 创建时间
+        String createTime = noteRowKey.split(Constants.ROWKEY_SEPARATOR)[1];
+        boolean ifSuccess = false;
+        // 删除旧笔记本下的笔记
+        ifSuccess = deleteNoteFromNoteBookTable(noteRowKey, createTime, "0", noteName, oldNoteBookRowkey, oldNoteBookNoteList);
+        if (ifSuccess) {
             try {
-                ifSucess = addNoteToOrderTable(noteRowKey, noteName,
-                        createTime, status, noteBookRowkey);
-                if (!ifSucess) {
-                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
-                            noteBookRowkey,
-                            Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                            Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST,
-                            JSONArray.fromObject(noteList).toString());
+                // 添加新笔记本下的笔记
+                ifSuccess = addNoteToNoteList(noteRowKey, noteName, createTime, "0", newNoteBookRowkey, newNoteBookNoteList);
+                if (!ifSuccess) {
+                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, oldNoteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray.fromObject(oldNoteBookNoteList).toString());
                 }
             } catch (Exception e) {
-                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
-                        noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                        Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray
-                                .fromObject(noteList).toString());
+                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, oldNoteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray
+                        .fromObject(oldNoteBookNoteList).toString());
                 e.printStackTrace();
                 return false;
             }
         }
-        return ifSucess;
+        return ifSuccess;
     }
 
+    /**
+     * 删除旧笔记本下的笔记信息
+     * @param noteRowKey
+     * @param createTime
+     * @param status
+     * @param oldNoteName
+     * @param noteBookRowkey
+     * @param noteList
+     * @return
+     */
+    public boolean deleteNoteFromNoteBookTable(String noteRowKey, String createTime, String status, String oldNoteName, String noteBookRowkey, List<String> noteList) {
+        // 修改对应笔记本信息
+        StringBuffer oldNoteBookToString = new StringBuffer();
+        oldNoteBookToString.append(noteRowKey)
+                .append(Constants.STRING_SEPARATOR).append(oldNoteName)
+                .append(Constants.STRING_SEPARATOR).append(createTime)
+                .append(Constants.STRING_SEPARATOR).append(status);
+        noteList.remove(oldNoteBookToString.toString());
+        String noteListToJson = JSONArray.fromObject(noteList).toString();// list转json
+        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, noteListToJson);
+    }
+
+
+
+
+   /*
 
 
 
@@ -629,27 +653,7 @@ public class NoteServiceImpl implements NoteService {
         return ifSuccess;
     }
 
-    public boolean deleteNoteFromNoteBookTable(String noteRowKey,
-                                               String createTime, String status, String oldNoteName,
-                                               String noteBookRowkey, List<String> noteList) {
-        // 修改对应笔记本信息
-        StringBuffer oldNoteBookToString = new StringBuffer();
-        oldNoteBookToString.append(noteRowKey)
-                .append(Constants.STRING_SEPARATOR).append(oldNoteName)
-                .append(Constants.STRING_SEPARATOR).append(createTime)
-                .append(Constants.STRING_SEPARATOR).append(status);
-        noteList.remove(oldNoteBookToString.toString());
-        String noteListToJson = JSONArray.fromObject(noteList).toString();// list转json
 
-        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
-                noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, noteListToJson);
-    }
-
-    public boolean deleteNoteFromNoteTable(String noteRowKey) {
-        // 删除笔记信息
-        return dataDao.deleteData(Constants.NOTE_TABLE_NAME, noteRowKey);
-    }
 
     @Override
     public boolean updateNote(String noteRowKey, String noteName,

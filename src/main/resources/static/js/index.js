@@ -289,7 +289,6 @@ $(function () {
                 dataType: "json",
                 data: {"noteBookName": title},
                 success: function (data) {
-                    alert(data.success);
                     flag = data.success;
                     if (flag) {
                         title = addNoteBook(title);
@@ -533,7 +532,7 @@ $(function () {
         var noteRowKey = dom.data('noteRowKey');
         $.ajax({
             type: "post",
-            url: basePath + "note/getNote",
+            url: basePath + "getNote",
             async: false,
             dataType: "json",
             data: {"noteRowkey": noteRowKey},
@@ -587,7 +586,7 @@ $(function () {
         var noteName = $('.alert_can').data('deleteNote').text();
         $.ajax({
             type: "post",
-            url: basePath + "note/moveAndDeleteNote",
+            url: basePath + "moveAndDeleteNote",
             async: false,
             dataType: "json",
             data: {
@@ -728,7 +727,7 @@ $(function () {
         var userName = getRowKeyUserName(noteRowKey);
         $.ajax({
             type: "post",
-            url: basePath + "note/getAllNoteBookByUserName",
+            url: basePath + "getAllNoteBookByUserName",
             async: false,
             dataType: "json",
             data: {"userName": userName},
@@ -768,7 +767,7 @@ $(function () {
         var oldNoteBookRowkey = $('#addNote').data('noteBookRowKey').data('noteBookRowKey');
         $.ajax({
             type: "post",
-            url: basePath + "note/moveAndDeleteNote",
+            url: basePath + "moveAndDeleteNote",
             async: false,
             dataType: "json",
             data: {
