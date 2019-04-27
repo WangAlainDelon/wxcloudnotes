@@ -638,7 +638,7 @@ $(function () {
         var oldNoteName = $('.alert_can').data('deleteRecycleNote').text();
         $.ajax({
             type: "post",
-            url: basePath + "note/deleteNote",
+            url: basePath + "deleteNote",
             async: false,
             dataType: "json",
             data: {"oldNoteName": oldNoteName, "noteRowKey": noteRowKey, "noteBookRowkey": noteBookRowkey},
@@ -947,7 +947,7 @@ $(function () {
         var userName = getRowKeyUserName(noteRowKey);
         $.ajax({
             type: "post",
-            url: basePath + "note/getAllNoteBookByUserName",
+            url: basePath + "getAllNoteBookByUserName",
             async: false,
             dataType: "json",
             data: {"userName": userName},
@@ -988,7 +988,7 @@ $(function () {
         var oldNoteBookRowkey = getRowKeyUserName(newNoteBookRowkey) + "_0000000000000";
         $.ajax({
             type: "post",
-            url: basePath + "note/moveAndDeleteNote",
+            url: basePath + "/moveAndDeleteNote",
             async: false,
             dataType: "json",
             data: {

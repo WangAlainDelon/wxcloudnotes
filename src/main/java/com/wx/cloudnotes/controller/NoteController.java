@@ -183,6 +183,29 @@ public class NoteController {
     }
 
 
-    //彻底删除笔记
+    /**
+     * 彻底删除笔记
+     *
+     * @param request
+     * @param oldNoteName
+     * @param noteRowKey
+     * @param noteBookRowkey
+     * @return
+     */
+    @RequestMapping("/note/deleteNote")
+    public ModelAndView deleteNote(HttpServletRequest request, String oldNoteName, String noteRowKey, String noteBookRowkey) {
+        ModelAndView modelAndView = null;
+        String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+        try {
+            String[] split = noteRowKey.split("\\" + Constants.ROWKEY_SEPARATOR);
+            boolean delNote = noteService.deleteNote(noteRowKey, split[1], "0", oldNoteName, noteBookRowkey);
+            ModelMap map = new ModelMap();
+            map.put("success", delNote);
+            modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return modelAndView;
+    }
 
 }

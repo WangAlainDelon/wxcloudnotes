@@ -1,9 +1,7 @@
 package com.wx.cloudnotes.service.imp;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -14,32 +12,15 @@ import com.wx.cloudnotes.dao.RedisDao;
 import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.service.NoteService;
-import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hdfs.web.JsonUtil;
 import org.apache.lucene.index.CorruptIndexException;
 /*import org.apache.lucene.queryParser.ParseException;*/
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Service;
 
-/*import com.itcast.tsc.note.bean.Article;
-import com.itcast.tsc.note.bean.Note;
-import com.itcast.tsc.note.bean.NoteBook;
-import com.itcast.tsc.note.bean.SearchBean;
-import com.itcast.tsc.note.dao.CreateIndexDao;
-import com.itcast.tsc.note.dao.DataDao;
-import com.itcast.tsc.note.dao.RedisDao;
-import com.itcast.tsc.note.dao.SearchIndexDao;
-import com.itcast.tsc.note.service.NoteService;
-import com.itcast.tsc.util.JsonUtil;
-import com.itcast.tsc.util.constants.Constants;*/
 
 @Service
 public class NoteServiceImpl implements NoteService {
@@ -595,6 +576,7 @@ public class NoteServiceImpl implements NoteService {
 
     /**
      * 删除旧笔记本下的笔记信息
+     *
      * @param noteRowKey
      * @param createTime
      * @param status
@@ -615,43 +597,53 @@ public class NoteServiceImpl implements NoteService {
         return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, noteListToJson);
     }
 
-
-
-
-   /*
-
-
-
-    @Override
-    public boolean deleteNote(String noteRowKey, String createTime,
-                              String status, String oldNoteName, String noteBookRowkey) {
+    /**
+     * 彻底删除笔记
+     *
+     * @param noteRowKey
+     * @param createTime
+     * @param status
+     * @param oldNoteName
+     * @param noteBookRowkey
+     * @return
+     */
+    public boolean deleteNote(String noteRowKey, String createTime, String status, String oldNoteName, String noteBookRowkey) {
         boolean ifSuccess = false;
         // 查询旧笔记信息
-        List<String> noteList = dataDao.queryByRowKeyString(
-                Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey);
-        ifSuccess = deleteNoteFromNoteBookTable(noteRowKey, createTime, status,
-                oldNoteName, noteBookRowkey, noteList);
+        List<String> noteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey);
+        ifSuccess = deleteNoteFromNoteBookTable(noteRowKey, createTime, status, oldNoteName, noteBookRowkey, noteList);
         if (ifSuccess) {
             try {
                 ifSuccess = deleteNoteFromNoteTable(noteRowKey);
                 if (!ifSuccess) {
-                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
-                            noteBookRowkey,
-                            Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                            Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST,
-                            JSONArray.fromObject(noteList).toString());
+                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray.fromObject(noteList).toString());
                 }
             } catch (Exception e) {
-                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
-                        noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
-                        Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray
-                                .fromObject(noteList).toString());
+                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, noteBookRowkey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray
+                        .fromObject(noteList).toString());
                 e.printStackTrace();
                 return false;
             }
         }
         return ifSuccess;
     }
+
+    /**
+     * 根据rowkey删除笔记的信息
+     *
+     * @param rowKey
+     * @return
+     */
+    private boolean deleteNoteFromNoteTable(String rowKey) {
+        return dataDao.deleteData(Constants.NOTE_TABLE_NAME, rowKey, Constants.NOTE_FAMLIY_CONTENTINFO);
+    }
+
+   /*
+
+
+
+    @Override
+
 
 
 

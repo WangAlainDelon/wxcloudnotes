@@ -7,29 +7,15 @@ import java.util.List;
 import com.wx.cloudnotes.common.Constants;
 import com.wx.cloudnotes.dao.DataDao;
 import com.wx.cloudnotes.domain.Note;
-import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.utils.JsonUtil;
 import com.wx.cloudnotes.utils.hbase.HbaseTools;
 import org.apache.commons.lang.StringUtils;
-import org.apache.hadoop.hbase.KeyValue;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Delete;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
-import org.apache.hadoop.hbase.filter.FilterList;
-import org.apache.hadoop.hbase.filter.RegexStringComparator;
-import org.apache.hadoop.hbase.filter.RowFilter;
-import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.hadoop.hbase.HbaseTemplate;
+
 import org.springframework.stereotype.Service;
 
 
