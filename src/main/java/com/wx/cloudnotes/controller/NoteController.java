@@ -138,15 +138,25 @@ public class NoteController {
     @RequestMapping("/note/moveAndDeleteNote")
     public ModelAndView moveAndDeleteNote(HttpServletRequest request, String noteRowKey, String oldNoteBookRowkey, String newNoteBookRowkey, String noteName) {
         ModelAndView modelAndView = null;
+        /**
+         * 笔记迁到同一个笔记本下是不允许的
+         */
         try {
-            boolean isMove = noteService.moveAndDeleteNote(noteRowKey, oldNoteBookRowkey, newNoteBookRowkey, noteName);
             ModelMap modelMap = new ModelMap();
-            if (isMove) {
-                modelMap.put("success", isMove);
-            } else {
+            if (oldNoteBookRowkey.equals(newNoteBookRowkey)) {
                 modelMap.put("success", false);
+                modelMap.put("message", "笔记不能迁移到同一个笔记本下面");
+                modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
+            } else {
+                boolean isMove = noteService.moveAndDeleteNote(noteRowKey, oldNoteBookRowkey, newNoteBookRowkey, noteName);
+                if (isMove) {
+                    modelMap.put("success", isMove);
+                } else {
+                    modelMap.put("success", false);
+                }
+                modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
             }
-            modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
+
         } catch (Exception e) {
             String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
             Logger bussinessLogger = LogUtils.getBussinessLogger();
@@ -203,9 +213,101 @@ public class NoteController {
             map.put("success", delNote);
             modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
         } catch (Exception e) {
+            Logger bussinessLogger = LogUtils.getBussinessLogger();
+            bussinessLogger.error("用户" + userName + "彻底删除笔记笔记异常|方法:deleteNote|参数： oldNoteName:" + oldNoteName + ";noteRowKey:" + noteRowKey + ";noteBookRowkey:" + noteBookRowkey, e);
             e.printStackTrace();
         }
         return modelAndView;
     }
+
+    /**
+     * 单击分享笔记,跳转到专栏模块页面
+     *
+     * @return
+     */
+    @RequestMapping("/note/showActivity")
+    public String getNoteListByNotebook(HttpServletRequest request) {
+        return "active/activity";
+    }
+
+    /**
+     * 单击专栏跳转到分享收藏笔记页面
+     *
+     * @param request
+     * @param rowKey
+     * @return
+     */
+    @RequestMapping("/note/openDetail")
+    public String openDetail(HttpServletRequest request, String rowKey) {
+        request.getSession().setAttribute(Constants.ACTIVITY_INFO, rowKey);
+        request.setAttribute("rowKey", rowKey);
+        return "active/activity_detail";
+    }
+
+    /**
+     * 选择笔记后点击确定分享笔记
+     *
+     * @param request
+     * @param noteRowKey
+     * @param oldNoteBookRowkey
+     * @param newNoteBookRowkey
+     * @return
+     */
+    @RequestMapping("/note/activeMyNote")
+    public ModelAndView activeMyNote(HttpServletRequest request, String noteRowKey, String oldNoteBookRowkey, String newNoteBookRowkey) {
+        ModelAndView modelAndView = null;
+        String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+        try {
+            boolean moveNote = noteService.activeMyNote(noteRowKey, newNoteBookRowkey,userName);
+            ModelMap map = new ModelMap();
+            map.put("success", moveNote);
+            modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return modelAndView;
+    }
+
+    /**
+     * 收藏笔记
+     *
+     * @param request
+     * @param noteRowKey
+     * @return
+     */
+    @RequestMapping("/note/starOtherNote")
+    public ModelAndView starOtherNote(HttpServletRequest request, String noteRowKey) {
+        System.out.println(noteRowKey);
+        //noteService.starOtherNote(noteRowKey,);
+        ModelAndView modelAndView = new ModelAndView();
+        return modelAndView;
+    }
+
+    /**
+     * 从lucene中分页查询更多笔记
+     *
+     * @param key  :输入的关键字
+     * @param page :页码
+     * @return
+     */
+   /* @RequestMapping("/searchMore")
+    public ModelAndView searchMore(HttpServletRequest request,
+                                   HttpServletResponse response, String key, Integer page) {
+        ModelMap map = new ModelMap();
+        List<Article> articles = new ArrayList<Article>();// 封装笔记信息
+        try {
+            articles = noteService.search(key, page);// 从lucene中查询笔记信息
+            JSONArray wes = JSONArray.fromObject(articles);// 将笔记信息list转为json
+            map.put("urls", wes.toString());
+            map.put("page", page + 1);
+            map.put("key", key);
+        } catch (Exception e) {
+            logger.error("从lucene中查询更多笔记异常:TechnologyController  &&  key:"
+                    + key + "；page" + page, e);
+            e.printStackTrace();
+        }
+        return new ModelAndView(new MappingJacksonJsonView(), map);
+    }
+*/
 
 }

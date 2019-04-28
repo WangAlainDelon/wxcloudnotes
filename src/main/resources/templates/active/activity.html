@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>New_note</title>
+
+    <link rel="stylesheet" href="../../static/css/edit.css"/>
+    <link rel="stylesheet" href="../../static/css/icon.css"/>
+    <link rel="stylesheet" href="../../static/css/prettify.min.css"/>
+</head>
+
+<body>
+<header class='clear_float'>
+    <div class="logo"></div>
+    <div class="loginbar">
+    </div>
+</header>
+<div class="row clear_float">
+    <!-- alert -->
+    <div class="alert_can" style='display:none;'>
+        <div class="alert_background"></div>
+        <div class="right_bottom">
+            <div class="panel_can"><!-- panel容器 -->
+                <!--div class="panel panel_deleteNote">
+                    <div class="panel_top">
+                        <h3 class="panel_title">收藏笔记</h3>
+                    </div>
+                    <div class="panel_middle">
+                        <h4>该笔记将被放至收藏笔记本,确认收藏吗?</h4>
+                    </div>
+                    <div class="panel_bottom">
+                        <input type="button" value="确 定" class="sure"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="button" value="取 消" class="cancle"/>
+                    </div>
+                </div-->
+            </div>
+        </div>
+    </div>
+    <!-- col_5 -->
+    <div class="col_5">
+        <ul id="col_panel_1">
+            <li class="ac_panel panel_green">
+               <!-- <%&#45;&#45;
+                页面编辑须知：需要填写id和方法的参数，活动块类似。
+                1、id="activity_0000000000101"：id顺序填写，从0000000000101开始。
+                2、onclick="openDetail('activity_0000000000101')"：将id传入方法中。
+                3、活动标题：任意
+                4、活动介绍：介绍内容，任意
+                &#45;&#45;%>-->
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000101')" id="activity_0000000000101">java技术专栏</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">java技术交流</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong>2019-8-29</strong></p>
+            </li>
+            <li class="ac_panel panel_red">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000102')" id="activity_0000000000102">大数据技术专栏</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">大数据技术交流</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong>2019-8-29</strong></p>
+            </li>
+            <li class="ac_panel panel_blue">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000103')" id="activity_0000000000103">人工智能专栏</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">人工智能技术交流</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong>2019-8-29</strong></p>
+            </li>
+        </ul>
+    </div>
+    <!-- col_6 -->
+    <div class="col_6">
+        <ul id="col_panel_2">
+            <li class="ac_panel panel_green">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000104')" id="activity_0000000000104">爬虫专栏</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">爬虫数据交流</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong>2019-8-29</strong></p>
+            </li>
+            <li class="ac_panel panel_red">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000105')" id="activity_0000000000105">Python专栏</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">Python技术交流</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong>2019-8-29</strong></p>
+            </li>
+            <li class="ac_panel panel_blue">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000106')" id="activity_0000000000106">模块努力构建中....</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">模块努力构建中....</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong></strong></p>
+            </li>
+        </ul>
+    </div>
+    <!-- col_7 -->
+    <div class="col_7">
+        <ul id="col_panel_3">
+            <li class="ac_panel panel_green">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000107')" id="activity_0000000000107">模块努力构建中....</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">模块努力构建中....</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong></strong></p>
+            </li>
+            <li class="ac_panel panel_red">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000108')" id="activity_0000000000108">模块努力构建中....</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">模块努力构建中....</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong></strong></p>
+            </li>
+            <li class="ac_panel panel_blue">
+                <h4 class="ac_title"><a class="ac_link" onclick="openDetail('activity_0000000000109')" id="activity_0000000000109">模块努力构建中....</a></h4>
+                <hr class="hr"/>
+                <p class="ac_info text_over">模块努力构建中....</p>
+                <hr class="hr"/>
+                <p class="ac_time">结束时间:<strong></strong></p>
+            </li>
+        </ul>
+    </div>
+    <!-- col_1 -->
+</div>
+<footer>
+    <div class="alert_success_s"></div>
+    <div class="alert_success_b"></div>
+</footer>
+<!--js的引入要有顺序，不然有些无法加载-->
+<script type="text/javascript" src="../../static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="../../static/js/jquery.nicescroll.min.js"></script>
+<script type="text/javascript" src="../../static/js/run_prettify.min.js"></script>
+<script type="text/javascript" src="../../static/js/Editor/kindeditor-min.js"></script>
+<script type="text/javascript" src="../../static/js/Editor/lang/zh_CN.js"></script>
+<script type="text/javascript" src="../../static/js/index.js"></script>
+<script type="text/javascript" src="../../static/js/BaseValues.js"></script>
+
+
+</body>
+</html>
+
+
+

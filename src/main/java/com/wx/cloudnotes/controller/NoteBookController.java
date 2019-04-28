@@ -2,10 +2,12 @@ package com.wx.cloudnotes.controller;
 
 import com.wx.cloudnotes.common.Constants;
 import com.wx.cloudnotes.common.WxResult;
+import com.wx.cloudnotes.domain.Article;
 import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.service.NoteService;
 import com.wx.cloudnotes.utils.log.LogUtils;
+import net.sf.json.JSONArray;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,8 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import org.thymeleaf.util.LoggingUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -180,6 +184,7 @@ public class NoteBookController {
                 noteListByNotebook = noteService.getNoteListByNotebook(rowkey);
                 ModelMap modelMap = new ModelMap();
                 modelMap.put("noteList", noteListByNotebook);
+                modelMap.put("success",true);
                 modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
             } catch (Exception e) {
                 Logger logger = LogUtils.getBussinessLogger();

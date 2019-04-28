@@ -434,7 +434,7 @@ public class NoteServiceImpl implements NoteService {
      * @throws Exception
      */
     @Override
-    public Note getNoteByRowKey(String noteRowkey) throws Exception {
+    public Note getNoteByRowKey(String noteRowkey) {
         return dataDao.queryNoteByRowKey(noteRowkey);
     }
 
@@ -548,6 +548,10 @@ public class NoteServiceImpl implements NoteService {
      */
     @Override
     public boolean moveAndDeleteNote(String noteRowKey, String oldNoteBookRowkey, String newNoteBookRowkey, String noteName) {
+        /**如果旧笔记本和新笔记本一样，那么新笔记会添加一个相同的笔记名字，而笔记的内容还是只有一份
+         * 如果在回收站清笔记，那么笔记的内容就有了，所以在前面应该控制笔记不能迁移到同一个笔记本下面
+         * */
+
         // 查询旧笔记本下的笔记信息，旧笔记本下的信息能够查询到
         List<String> oldNoteBookNoteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, oldNoteBookRowkey);
         // 查询新笔记本下的笔记信息
@@ -638,15 +642,91 @@ public class NoteServiceImpl implements NoteService {
         return dataDao.deleteData(Constants.NOTE_TABLE_NAME, rowKey, Constants.NOTE_FAMLIY_CONTENTINFO);
     }
 
-   /*
-
-
-
+    /**
+     * 分享笔记
+     *
+     * @param noteRowKey
+     * @param activityBtRowKey
+     * @return
+     */
     @Override
+    public boolean activeMyNote(String noteRowKey, String activityBtRowKey, String userName) {
+        Note note = getNoteByRowKey(noteRowKey);// 获取笔记信息
+        if (note == null) {
+            return false;
+        }
+        //将用户的笔记添加到某个专栏下面
+        boolean addNote = addNoteToActive(note, noteRowKey, note.getName(), note.getCreateTime(), note.getStatus(), activityBtRowKey, userName);
+        return addNote;
+    }
+
+    /**
+     * 收藏笔记
+     *
+     * @param noteRowKey
+     * @param starBtRowKey
+     * @return
+     */
+    @Override
+    public boolean starOtherNote(String noteRowKey, String starBtRowKey) {
+        return false;
+    }
+
+    /**
+     * 将普通笔记的的信息添加到分享出去的活动笔记列表
+     */
+    private boolean addNoteToActive(Note note, String noteRowKey, String noteName, String createTime, String status, String activityBtRowKey, String userName) {
+        boolean ifSucess = false;
+        // 查询该专栏旧的笔记列表
+        List<String> noteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, activityBtRowKey);
+        //添加到某个专栏的笔记本下面
+        ifSucess = addNoteToNoteList(noteRowKey, noteName, createTime, status, activityBtRowKey, noteList);
+        if (ifSucess) {
+            try {
+                //如果修改nb(笔记本表)成功，就将笔记的信息添加到n(笔记表)中
+                ifSucess = updateNoteFromNoteTable(activityBtRowKey, noteName, createTime, note.getContent(), status);
+                if (!ifSucess) {
+                    //如果插入笔记表失败，那么还原笔记本表
+                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, activityBtRowKey,
+                            Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
+                            Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST,
+                            JSONArray.fromObject(noteList).toString());
+                }
+                List<String> userActiveRowKey = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, userName.trim() + Constants.ACTIVITY);
+                //同时如果用户想看到自己分享过的笔记本，那么需要添加到用户分享笔记本下rowKey:loginName_0000000000002
+                ifSucess = addNoteToNoteList(noteRowKey, note.getName(), note.getCreateTime(), note.getStatus(), userName.trim() + Constants.ACTIVITY, userActiveRowKey);
+                if (!ifSucess) {
+                    //如果插入笔记表失败，那么还原笔记本表
+                    dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, activityBtRowKey,
+                            Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
+                            Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST,
+                            JSONArray.fromObject(noteList).toString());
+                }
+            } catch (Exception e) {
+                dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME,
+                        activityBtRowKey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO,
+                        Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray
+                                .fromObject(noteList).toString());
+                e.printStackTrace();
+                return false;
+            }
+        }
+        return ifSucess;
+     /*   List<String> activeNoteList = dataDao.queryByRowKeyString(Constants.NOTEBOOK_TABLE_NAME, activityBtRowKey);
+        if (activeNoteList == null) {
+            activeNoteList = new ArrayList<>();
+        }
+        if (note == null) {
+            return false;
+        }
+        activeNoteList.add(note.getRowKey());
+        return dataDao.insertData(Constants.NOTEBOOK_TABLE_NAME, activityBtRowKey, Constants.NOTEBOOK_FAMLIY_NOTEBOOKINFO, Constants.NOTEBOOK_NOTEBOOKINFO_CLU_NOTELIST, JSONArray.fromObject(activeNoteList).toString());*/
+    }
 
 
 
 
+    /*
     @Override
     public boolean updateNote(String noteRowKey, String noteName,
                               String createTime, String content, String status,
@@ -784,8 +864,8 @@ public class NoteServiceImpl implements NoteService {
     public boolean shareNote(String rowKey) throws CorruptIndexException,
             IOException {
         Result queryByRowKey = dataDao.queryByRowKey(Constants.NOTE_TABLE_NAME,
-                rowKey);// 查询笔记
-        // 封装参数
+                rowKey);//
+        // 封装参数查询笔记
         String noteName = new String(queryByRowKey.getValue(
                 Bytes.toBytes(Constants.NOTE_FAMLIY_NOTEINFO),
                 Bytes.toBytes(Constants.NOTE_NOTEINFO_CLU_NOTENAME)));

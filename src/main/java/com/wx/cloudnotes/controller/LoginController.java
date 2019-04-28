@@ -4,19 +4,17 @@ import com.wx.cloudnotes.common.Constants;
 import com.wx.cloudnotes.common.WxResult;
 import com.wx.cloudnotes.domain.User;
 import com.wx.cloudnotes.utils.log.LogUtils;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @Controller
 public class LoginController {
-
 
 
     @RequestMapping("/login")
@@ -35,7 +33,7 @@ public class LoginController {
      */
     @RequestMapping("/userLogin")
     @ResponseBody
-    public WxResult login( User user,HttpServletRequest request) {
+    public WxResult login(User user, HttpServletRequest request) {
         /**经过一番验证登陆成功*/
         WxResult wxResult = new WxResult();
         try {
@@ -48,12 +46,20 @@ public class LoginController {
             LogUtils.getExceptionLogger().error("登录失败:" + "userName=" + user.getUser_name(), e);
 
         }
-        System.out.println(user.getUser_name());
-        Constants.Current_User = user.getUser_name();
-        HttpSession session=request.getSession();//获取session并将userName存入session对象
-        session.setAttribute(Constants.USER_INFO,user.getUser_name());
+        HttpSession session = request.getSession();//获取session并将userName存入session对象
+        session.setAttribute(Constants.USER_INFO, user.getUser_name());
         wxResult.setStatus(200);
         return wxResult;
+    }
+
+    /**
+     * 注销登陆
+     * @return
+     */
+    @RequestMapping("/cancelLogin")
+    public void cancelLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.getSession().setAttribute(Constants.USER_INFO,null);
+        response.sendRedirect("/login");
     }
 
 }

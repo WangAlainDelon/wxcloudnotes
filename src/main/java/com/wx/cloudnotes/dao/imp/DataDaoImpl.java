@@ -138,7 +138,7 @@ public class DataDaoImpl implements DataDao {
             list.add(noteRowkey);
             List<Result> listRowkeyData = hbaseTools.getListRowkeyData(Constants.NOTE_TABLE_NAME, list, StringUtils.EMPTY, StringUtils.EMPTY);
             for (Result listRowkeyDatum : listRowkeyData) {
-                note.setRowKey(String.valueOf(listRowkeyDatum.getRow()));
+                note.setRowKey(noteRowkey);
                 byte[] valueName = listRowkeyDatum.getValue(Bytes.toBytes(Constants.NOTE_FAMLIY_NOTEINFO), Bytes.toBytes(Constants.NOTE_NOTEINFO_CLU_NOTENAME));
                 note.setName(new String(valueName, "UTF-8"));
                 byte[] valueCreateTime = listRowkeyDatum.getValue(Bytes.toBytes(Constants.NOTE_FAMLIY_NOTEINFO), Bytes.toBytes(Constants.NOTE_NOTEINFO_CLU_CREATETIME));

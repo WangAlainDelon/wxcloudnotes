@@ -163,11 +163,11 @@ function cleanEditor() {
 }
 
 function openActivity() {
-    window.open(basePath + "note/showActivity");
+    window.open(basePath + "showActivity");
 }
 
 function openDetail(rowKey) {
-    window.open(basePath + "note/openDetail?rowKey=" + rowKey);
+    window.open(basePath + "openDetail?rowKey=" + rowKey);
 }
 
 function addMyActivityNote(title) {
@@ -510,6 +510,7 @@ $(function () {
                     $('#inputNoteTitle').val(
                         data.note.name
                     );
+                    //展示页隐藏，修改页面打开
                     $('#viewNote').hide();
                     $('#editNote').show();
                     editor.html(data.note.content);
@@ -551,6 +552,7 @@ $(function () {
                     //AJAX
                     $('#viewNote').show();
                     $('#editNote').hide();
+
                 }
 
             },
@@ -782,7 +784,10 @@ $(function () {
                     //AJAX
                     $('.alert_can').data('moveNote').remove();
                     $('.cancle').trigger('click');
+                } else {
+                    alert(data.message);
                 }
+
             },
             error: function (data) {
             }
@@ -891,7 +896,7 @@ $(function () {
         var noteBookRowKey = $("#activityBt").data("activityBtRowKey");
         $.ajax({
             type: "post",
-            url: basePath + "note/getNoteListByNotebook",
+            url: basePath + "getNoteListByNotebook",
             async: false,
             dataType: "json",
             data: {"rowkey": noteBookRowKey},
@@ -1104,7 +1109,7 @@ $(function () {
     $('#addActivityNote').click(function () {
         $.ajax({
             type: "post",
-            url: basePath + "note/getAllNoteBook",
+            url: basePath + "getAllNoteBook",
             async: false,
             dataType: "json",
             success: function (data) {
@@ -1134,7 +1139,7 @@ $(function () {
         var noteBookRowKey = $(this).val();
         $.ajax({
             type: "post",
-            url: basePath + "note/getNoteListByNotebook",
+            url: basePath + "getNoteListByNotebook",
             async: false,
             dataType: "json",
             data: {"rowkey": noteBookRowKey},
@@ -1171,7 +1176,9 @@ $(function () {
     $('.panel_can').on('click', '.panel_selectNote .sure', function () {
         var noteRowKey = $("#selectNote").val();
         var oldNoteBookRowkey = $("#selectNoteBook").val();
-        var newNoteBookRowkey = $("#activity_rowkey_hidden").val();
+        /*var newNoteBookRowkey = $("#activity_rowkey_hidden").val();*/
+        var newNoteBookRowkey = $("#active_info").text();
+        alert(newNoteBookRowkey);
         if (noteRowKey == 0 || oldNoteBookRowkey == 0) {
             show_success($('.alert_success_b'), '请选择正确的笔记本或者笔记');
             return;
@@ -1179,7 +1186,7 @@ $(function () {
         var title = $("#selectNote option[value='" + noteRowKey + "']").text();
         $.ajax({
             type: "post",
-            url: basePath + "note/activeMyNote",
+            url: basePath + "activeMyNote",
             async: false,
             dataType: "json",
             data: {
@@ -1194,7 +1201,7 @@ $(function () {
                     title = addActivityNote(title);
                     $('#all_activity_note').prepend(title);
                     $('#all_activity_note li:first').data('noteRowKey', noteRowKey);
-                    show_success($('.alert_success_all'), '参加活动成功');
+                    show_success($('.alert_success_all'), '分享笔记成功');
                     $('.cancle').trigger('click');
                 }
 
@@ -1229,7 +1236,7 @@ $(function () {
         var noteRowKey = $('.alert_can').data('starActivityNote').data('noteRowKey');
         $.ajax({
             type: "post",
-            url: basePath + "note/starOtherNote",
+            url: basePath + "starOtherNote",
             async: false,
             dataType: "json",
             data: {"noteRowKey": noteRowKey},

@@ -29,8 +29,11 @@ public interface NoteService {
 
     boolean moveAndDeleteNote(String noteRowKey, String oldNoteBookRowkey, String newNoteBookRowkey, String noteName);
 
-    boolean deleteNote(String noteRowKey,  String createTime, String status, String oldNoteName, String noteBookRowkey);
+    boolean deleteNote(String noteRowKey, String createTime, String status, String oldNoteName, String noteBookRowkey);
 
+    boolean  activeMyNote(String noteRowKey, String activityBtRowKey,String userName);
+
+    boolean starOtherNote(String noteRowKey, String starBtRowKey);
     /*
 
 
