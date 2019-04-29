@@ -5,9 +5,6 @@ import java.util.List;
 
 import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
-import org.apache.lucene.index.CorruptIndexException;
-/*import org.apache.lucene.queryParser.ParseException;*/
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 
 
 public interface NoteService {
@@ -33,21 +30,7 @@ public interface NoteService {
 
     boolean  activeMyNote(String noteRowKey, String activityBtRowKey,String userName);
 
-    boolean starOtherNote(String noteRowKey, String starBtRowKey);
-    /*
+    boolean starOtherNote(String noteRowKey, String starBtRowKey,String userName);
 
 
-
-    boolean moveAndDeleteNote(String noteRowKey, String oldNoteBookRowkey,
-                              String newNoteBookRowkey, String noteName);
-
-    boolean shareNote(String rowKey) throws CorruptIndexException, IOException;
-
-  *//*  List<Article> search(String key, int page) throws InterruptedException,
-            ParseException, IOException, InvalidTokenOffsetsException;*//*
-
-    boolean starOtherNote(String noteRowKey, String starBtRowKey);
-
-    public boolean activeMyNote(String noteRowKey,
-                                String activityBtRowKey);*/
 }

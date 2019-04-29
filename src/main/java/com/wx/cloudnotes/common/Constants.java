@@ -1,10 +1,5 @@
 package com.wx.cloudnotes.common;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-
-
 /**
  * 平台常量
  */
@@ -15,13 +10,6 @@ public class Constants {
     public static final String USER_INFO = "userinfo";
     public static String Current_User;
 
-    /**
-     * hbase配置
-     */
-    public static Configuration CONFIG;//配置信息类
-    public static HBaseAdmin ADMIN;//表管理类
-    public static Connection CONNECTION;
-    public static long HBASE_WRITE_BUFFER;  //批量写的buffer大小
     /**
      * 笔记本信息
      **/
@@ -46,21 +34,6 @@ public class Constants {
      * 笔记rowKey前缀
      **/
     public static final String NOTE_PREFIX = "note" + Constants.ROWKEY_SEPARATOR;
-
-    /**
-     * lucene配置
-     */
-    public static String LUCENE_DIR;//lucene库文件夹
-    public static String FILE_DIR;//content文件夹
-    public static int LUCENE_PAGE_COUNT;//lucene分页，每页大小
-
-    /**
-     * redis配置
-     */
-    public static String REDIS_IP;
-    public static int REDIS_PORT;
-    public static int REDIS_TIMOUT;
-    public static String REDIS_AUTH;
 
     /**
      * 特殊笔记列表

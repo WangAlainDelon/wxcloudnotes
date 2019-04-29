@@ -1,13 +1,12 @@
 package com.wx.cloudnotes.controller;
 
 import com.wx.cloudnotes.common.Constants;
-import com.wx.cloudnotes.common.WxResult;
-import com.wx.cloudnotes.domain.Article;
+
 import com.wx.cloudnotes.domain.Note;
 import com.wx.cloudnotes.domain.NoteBook;
 import com.wx.cloudnotes.service.NoteService;
 import com.wx.cloudnotes.utils.log.LogUtils;
-import net.sf.json.JSONArray;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,11 +14,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
-import org.thymeleaf.util.LoggingUtils;
+
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Controller
@@ -171,24 +169,38 @@ public class NoteBookController {
 
     /**
      * 单击笔记本的时候查询该笔记本下所有的笔记
-     *
+     * 在用户没有添加笔记本的时候点击收藏分享回收站是没有笔记的
      * @param rowkey rowkey为noteBook的rowkey  wx@163.com_312312
      * @return
      */
     @RequestMapping("/note/getNoteListByNotebook")
-    public ModelAndView getNoteListByNotebook(HttpServletRequest request, String rowkey) {
+    public ModelAndView getNoteListByNotebook(HttpServletRequest request, String rowkey, String type) {
         ModelAndView modelAndView = null;
         List<Note> noteListByNotebook = null;
+        String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+        //点击收藏，查看用户收藏的笔记
+        if (type != null && type.equals("star")) {
+            if (rowkey == null) {
+                rowkey=userName.trim()+Constants.STAR;
+            }
+        }
+        //点击分享查看用户分享的笔记
+        if (type != null && type.equals("active")) {
+            if (rowkey == null) {
+                rowkey=userName.trim()+Constants.ACTIVITY;
+            }
+        }
+
+
         if (rowkey != null || !"".equals(rowkey)) {
             try {
                 noteListByNotebook = noteService.getNoteListByNotebook(rowkey);
                 ModelMap modelMap = new ModelMap();
                 modelMap.put("noteList", noteListByNotebook);
-                modelMap.put("success",true);
+                modelMap.put("success", true);
                 modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
             } catch (Exception e) {
                 Logger logger = LogUtils.getBussinessLogger();
-                String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
                 logger.error("用户" + userName + "获取笔记本的笔记异常|方法getNoteListByNotebook|参数:rowkey:" + rowkey, e);
                 e.printStackTrace();
             }

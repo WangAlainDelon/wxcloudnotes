@@ -258,7 +258,7 @@ public class NoteController {
         ModelAndView modelAndView = null;
         String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
         try {
-            boolean moveNote = noteService.activeMyNote(noteRowKey, newNoteBookRowkey,userName);
+            boolean moveNote = noteService.activeMyNote(noteRowKey, newNoteBookRowkey, userName);
             ModelMap map = new ModelMap();
             map.put("success", moveNote);
             modelAndView = new ModelAndView(new MappingJackson2JsonView(), map);
@@ -277,37 +277,24 @@ public class NoteController {
      */
     @RequestMapping("/note/starOtherNote")
     public ModelAndView starOtherNote(HttpServletRequest request, String noteRowKey) {
-        System.out.println(noteRowKey);
-        //noteService.starOtherNote(noteRowKey,);
-        ModelAndView modelAndView = new ModelAndView();
+        ModelAndView modelAndView = null;
+        String userName = (String) request.getSession().getAttribute(Constants.USER_INFO);
+        String starRowKey = userName.trim() + Constants.STAR;
+        ModelMap modelMap = new ModelMap();
+        try {
+            boolean reStar = noteService.starOtherNote(noteRowKey, starRowKey,userName);
+            if (reStar) {
+                modelMap.put("success", true);
+            } else {
+                modelMap.put("success", false);
+            }
+
+            modelAndView = new ModelAndView(new MappingJackson2JsonView(), modelMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return modelAndView;
     }
 
-    /**
-     * 从lucene中分页查询更多笔记
-     *
-     * @param key  :输入的关键字
-     * @param page :页码
-     * @return
-     */
-   /* @RequestMapping("/searchMore")
-    public ModelAndView searchMore(HttpServletRequest request,
-                                   HttpServletResponse response, String key, Integer page) {
-        ModelMap map = new ModelMap();
-        List<Article> articles = new ArrayList<Article>();// 封装笔记信息
-        try {
-            articles = noteService.search(key, page);// 从lucene中查询笔记信息
-            JSONArray wes = JSONArray.fromObject(articles);// 将笔记信息list转为json
-            map.put("urls", wes.toString());
-            map.put("page", page + 1);
-            map.put("key", key);
-        } catch (Exception e) {
-            logger.error("从lucene中查询更多笔记异常:TechnologyController  &&  key:"
-                    + key + "；page" + page, e);
-            e.printStackTrace();
-        }
-        return new ModelAndView(new MappingJacksonJsonView(), map);
-    }
-*/
 
 }

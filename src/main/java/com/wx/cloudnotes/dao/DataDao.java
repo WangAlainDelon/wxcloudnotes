@@ -5,14 +5,9 @@ import java.util.List;
 
 import com.wx.cloudnotes.domain.Note;
 import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
+
 
 public interface DataDao {
-   /*
-    public ResultScanner queryAll(String tableName) throws IOException;
-
-    public ResultScanner querySome(String tableName, List<String> rowKeys)
-            throws IOException;*/
 
     boolean insertData(String tableName, String rowKey, String family, String qualifier, String value);
 
@@ -28,11 +23,5 @@ public interface DataDao {
 
     Note queryNoteByRowKey(String noteRowkey);
 
-   /* public void copyData(String fromTableName, String toTableName, String fromRowKey, String toRowKey) throws IOException;
 
-
-
-
-
-    public Result queryByRowKey(String noteTableName, String rowKey);*/
 }

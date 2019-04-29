@@ -859,12 +859,14 @@ $(function () {
         click_special($(this));
         $('.col_2').html(noteCan.note_star);
         var noteBookRowKey = $("#starBt").data("starBtRowKey");
+        alert("单击收藏");
+        alert(noteBookRowKey);
         $.ajax({
             type: "post",
-            url: basePath + "note/getNoteListByNotebook",
+            url: basePath + "getNoteListByNotebook",
             async: false,
             dataType: "json",
-            data: {"rowkey": noteBookRowKey},
+            data: {"rowkey": noteBookRowKey,"type":"star"},
             success: function (data) {
                 //alert(data.allNoteBook);
                 if (data.noteList != null) {
@@ -899,7 +901,7 @@ $(function () {
             url: basePath + "getNoteListByNotebook",
             async: false,
             dataType: "json",
-            data: {"rowkey": noteBookRowKey},
+            data: {"rowkey": noteBookRowKey,"type":"active"},
             success: function (data) {
                 if (data.noteList != null) {
                     var allNoteList = eval(data.noteList);
